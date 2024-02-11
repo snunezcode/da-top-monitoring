@@ -1,3 +1,5 @@
+conf/run.sh
+conf/sync-int.sh
 demo/
 frontend/node_modules/
 frontend/public/aws-exports.json
