@@ -1,11 +1,10 @@
-import {useState,useEffect,useRef} from 'react'
+import { useState,useEffect } from 'react'
 import Axios from 'axios'
 import { configuration, SideMainLayoutHeader,SideMainLayoutMenu } from './Configs';
 import { createSearchParams } from "react-router-dom";
 
 import { applicationVersionUpdate, getMatchesCountText, paginationLabels, pageSizePreference, EmptyState } from '../components/Functions';
 import { createLabelFunction } from '../components/Functions';
-
 
 import SideNavigation from '@cloudscape-design/components/side-navigation';
 import AppLayout from '@cloudscape-design/components/app-layout';
@@ -19,8 +18,6 @@ import { StatusIndicator } from '@cloudscape-design/components';
 import { ColumnLayout } from '@cloudscape-design/components';
 import { Box } from '@cloudscape-design/components';
 import Flashbar from "@cloudscape-design/components/flashbar";
-
-
 
 import { SplitPanel } from '@cloudscape-design/components';
 import SpaceBetween from "@cloudscape-design/components/space-between";
@@ -133,11 +130,9 @@ function Application() {
             Axios.get(`${api_url}/api/aws/emr/cluster/list`,{
                       params: params, 
                   }).then((data)=>{
-                   console.log(data);
-                   
+                    
                    var clusters = [];
                    data['data']?.['Clusters'].forEach(function(item) {
-                    
                         clusters.push({
                                         id : item['Id'],
                                         name : item['Name'],
@@ -160,7 +155,7 @@ function Application() {
                      
               })
               .catch((err) => {
-                  console.log('Timeout API Call : /api/aws/metric/analyzer/clw/get/imports/' );
+                  console.log('Timeout API Call : /api/aws/emr/cluster/list' );
                   console.log(err);
                   
               });
@@ -168,13 +163,13 @@ function Application() {
         }
         catch{
         
-          console.log('Timeout API error : /api/aws/metric/analyzer/clw/get/imports/');                  
+          console.log('Timeout API error : /api/aws/emr/cluster/list');                  
           
         }
     
     }
     
-    function onClickOpenAnalyzer(){
+    function onClickConnect(){
         
             // Add CSRF Token
             Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
@@ -199,7 +194,7 @@ function Application() {
 
     }
     
-    //-- Call API to App Version
+    //-- Function Gather App Version
    async function gatherVersion (){
 
         //-- Application Update
@@ -222,7 +217,7 @@ function Application() {
    }
    
     useEffect(() => {
-        //gatherVersion();
+        gatherVersion();
         gatherClusters();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -257,7 +252,7 @@ function Application() {
                                                     direction="horizontal"
                                                     size="xs"
                                                   >
-                                                    <Button variant="primary" onClick={() => { onClickOpenAnalyzer(); }}>Connect</Button>
+                                                    <Button variant="primary" onClick={() => { onClickConnect(); }}>Connect</Button>
                                                   </SpaceBetween>
                                           }
                                           
@@ -307,6 +302,7 @@ function Application() {
             content={
                 
                 <div style={{"padding" : "2em"}}>
+                    <Flashbar items={versionMessage} />
                     <Table
                           {...collectionProps}
                           selectionType="single"
@@ -319,7 +315,7 @@ function Application() {
                                       direction="horizontal"
                                       size="xs"
                                     >
-                                      <Button variant="primary" onClick={ onClickOpenAnalyzer }>Connect</Button>
+                                      <Button variant="primary" onClick={ onClickConnect }>Connect</Button>
                                       <Button variant="primary" onClick={() => { gatherClusters(); }}>Refresh</Button>
                                     </SpaceBetween>
                                   }

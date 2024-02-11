@@ -132,70 +132,22 @@ Resources:
                         {
                             "Effect": "Allow",
                             "Action": [
-                                "logs:GetLogEvents"
-                            ],
-                            "Resource": [
-                                "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:RDSOSMetrics:log-stream:*"
-                            ]
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": [
                                 "cloudwatch:GetMetricData"
                             ],
                             "Resource": "*"
                         },
-                        {
-                            "Effect": "Allow",
-                            "Action": [
-                                "rds:DescribeDBInstances"
-                            ],
-                            "Resource": "arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:*"
-                        },
-                         {
-                            "Effect": "Allow",
-                            "Action": [
-                                "rds:DescribeDBClusters"
-                            ],
-                            "Resource": "arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:*"
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": [
-                                "elasticache:DescribeReplicationGroups"
-                            ],
-                            "Resource": "arn:aws:elasticache:${AWS::Region}:${AWS::AccountId}:replicationgroup:*"
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": [
-                                "elasticache:DescribeServerlessCaches"
-                            ],
-                            "Resource": "arn:aws:elasticache:${AWS::Region}:${AWS::AccountId}:serverlesscache:*"
-                        },
-                        {
-                			"Effect": "Allow",
-                			"Action": "memorydb:DescribeClusters",
-                			"Resource": "arn:aws:memorydb:${AWS::Region}:${AWS::AccountId}:cluster/*"
-                		},
                 		{
-                            "Effect": "Allow",
-                            "Action": "docdb-elastic:GetCluster",
-                            "Resource": "arn:aws:docdb-elastic:${AWS::Region}:${AWS::AccountId}:cluster/*"
-                        },
-                        {
-                            "Effect": "Allow",
-                            "Action": "docdb-elastic:ListClusters",
-                            "Resource": "*"
-                        },
-                        {
                 			"Effect": "Allow",
-                			"Action": "dynamodb:DescribeTable",
-                			"Resource": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/*"
+                			"Action": [
+                				"elasticmapreduce:ListInstances",
+                				"elasticmapreduce:ListSteps",
+                				"elasticmapreduce:DescribeCluster"
+                			],
+                			"Resource": "arn:aws:elasticmapreduce:*:${AWS::AccountId}:cluster/*"
                 		},
                 		{
                 			"Effect": "Allow",
-                			"Action": "dynamodb:ListTables",
+                			"Action": "elasticmapreduce:ListClusters",
                 			"Resource": "*"
                 		}
                     ]

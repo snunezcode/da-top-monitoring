@@ -32,12 +32,6 @@ cp /aws/apps/conf/aws-exports.json /aws/apps/server/
 #Re-Start NGINX Services
 sudo service nginx restart
 
-
-#Download PEM Key for DocumentDB
-cd /aws/apps/server/; wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
-
-
-
 #NodeJS Installation
 curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh --output install.sh
 sh install.sh

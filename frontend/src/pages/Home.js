@@ -148,10 +148,10 @@ function Home() {
                                          <ColumnLayout columns={1} variant="text-grid">
                                               <div>
                                                 <Header variant="h3">
-                                                  Monitor instance performance
+                                                  Monitor service performance
                                                 </Header>
                                                 <Box variant="p">
-                                                  Visualize performance data on realtime, and correlate data to understand and resolve the root cause of performance issues in your database resources.
+                                                  Visualize performance data on realtime, and correlate data to understand and resolve the root cause of performance issues in your AWS resources.
                                                 </Box>
                                               </div>
                                               <div>
@@ -159,7 +159,7 @@ function Home() {
                                                   Perform root cause analysis
                                                 </Header>
                                                 <Box variant="p">
-                                                  Analyze database and operating system metrics to speed up debugging and reduce overall mean time to resolution.
+                                                  Analyze service and operating system metrics to speed up debugging and reduce overall mean time to resolution.
                                                 </Box>
                                               </div>
                                               <div>
@@ -167,7 +167,7 @@ function Home() {
                                                   Optimize resources proactively
                                                 </Header>
                                                 <Box variant="p">
-                                                  Identify top consumer sessions, gather database statements and resource usages.
+                                                  Identify top consumer resources, gather performance metrics and resource usages.
                                                 </Box>
                                               </div>
                                               

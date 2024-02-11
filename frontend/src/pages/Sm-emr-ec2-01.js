@@ -1,47 +1,30 @@
 import {useState,useEffect,useRef} from 'react'
 import Axios from 'axios'
 import { configuration } from './Configs';
-import { metricCatalog } from './MetricCatalog';
 import { useSearchParams } from 'react-router-dom';
 
-import { applicationVersionUpdate, classMetrics } from '../components/Functions';
-import { createLabelFunction, customFormatNumberLong, customFormatNumber, customFormatNumberShort, customFormatDateDifference, customStatusStep } from '../components/Functions';
+import { applicationVersionUpdate } from '../components/Functions';
+import { createLabelFunction, customFormatNumberLong, customFormatNumber, customFormatDateDifference } from '../components/Functions';
 
-import DateRangePicker from "@cloudscape-design/components/date-range-picker";
-import Flashbar from "@cloudscape-design/components/flashbar";
-import FormField from "@cloudscape-design/components/form-field";
-import Textarea from "@cloudscape-design/components/textarea";
+import Header from "@cloudscape-design/components/header";
 import StatusIndicator from "@cloudscape-design/components/status-indicator";
 import Spinner from "@cloudscape-design/components/spinner";
-
-
 import { SplitPanel } from '@cloudscape-design/components';
 import AppLayout from '@cloudscape-design/components/app-layout';
-import ProgressBar from "@cloudscape-design/components/progress-bar";
 import Select from "@cloudscape-design/components/select";
-import ExpandableSection from "@cloudscape-design/components/expandable-section";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import Box from "@cloudscape-design/components/box";
-import Button from "@cloudscape-design/components/button";
 import Container from "@cloudscape-design/components/container";
 import CustomHeader from "../components/Header";
-import { ColumnLayout } from '@cloudscape-design/components';
 import Tabs from "@cloudscape-design/components/tabs";
 
-
-
 import CompMetric01  from '../components/Metric01';
-import ChartLine02  from '../components/ChartLine02';
 import ChartLine04  from '../components/ChartLine04';
 import CustomTable02 from "../components/Table02";
-import CustomLabel from "../components/Label01";
-import CustomDateTimePicker from "../components/DateTimePicker";
-import ChartProgressBar01 from '../components/ChartProgressBar-01';
 import ChartRadialBar01 from '../components/ChartRadialBar01';
 import ChartPie01 from '../components/ChartPie-01';
 import ChartColumn01  from '../components/ChartColumn01';
 
-import Header from "@cloudscape-design/components/header";
 import '@aws-amplify/ui-react/styles.css';
 
 export const splitPanelI18nStrings: SplitPanelProps.I18nStrings = {
@@ -64,8 +47,7 @@ function Application() {
 
     //-- Application Version
     const [versionMessage, setVersionMessage] = useState([]);
-    const [objectConfiguration, setObjectConfiguration] = useState({ resourceName : "", resourceType : "", expId : "", impId : "", resources : {} , metadata : {} });
-  
+
     //-- Add Header Cognito Token
     Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
     Axios.defaults.headers.common['x-token-cognito'] = sessionStorage.getItem("x-token-cognito");
@@ -78,10 +60,6 @@ function Application() {
     var parameter_object_values = JSON.parse(parameter_object_bytes.toString(CryptoJS.enc.Utf8));
     
     //-- Variable for Active Tabs
-    const [activeTabId, setActiveTabId] = useState("tab01");
-    const currentTabId = useRef("tab01");
-    
-    
     const [activeSubTabId, setActiveSubTabId] = useState("tab02-01");
     const currentSubTabId = useRef("tab02-01");
     
@@ -93,15 +71,6 @@ function Application() {
     
     //-- Node Identfied
     const currentInstanceIdentifier = useRef("");
-    
-    
-    //-- Performance Information
-    const [objectPerformanceChart, setObjectPerformanceChart] = useState({
-                                                        summaryChart : {}
-                                                        
-        
-    });
-    
     
     //-- Table Nodes
     const columnsTableNodes =  [
@@ -146,9 +115,7 @@ function Application() {
     
     const visibleContentSteps = ['id','name', 'status', 'createdDate', 'startedDate', 'action','elaspsed'];
     
-    
-    
-    
+
     const [clusterStats,setClusterStats] = useState({
                                                         clusterId       : "",
                                                         name            : "",
@@ -305,14 +272,12 @@ function Application() {
                                 { label : 'Running', value : 'RUNNING' },
                             ];
     
-    //-- Gather Resource Stats
+    //-- Gather Global Stats
     async function gatherClusterData(){
         try {
             
             Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
             var api_url = configuration["apps-settings"]["api-url"];
-            
-            //sessionStorage.setItem(data.data.session_id, data.data.session_token );
             
             //-- Measures
             var params = {
@@ -324,8 +289,7 @@ function Application() {
             await Axios.get(`${api_url}/api/aws/emr/cluster/open/connection`,{
                       params: params, 
                   }).then((data)=>{
-                      console.log(data);
-                     
+                      
               })
               .catch((err) => {
                   console.log('API Call error : /api/aws/emr/cluster/open/connection' );
@@ -345,7 +309,7 @@ function Application() {
     }
     
     
-    //-- Function Cluster Gather Stats
+    //-- Function Gather Cluster Stats
     async function gatherClusterStats() {
         
             Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
@@ -359,10 +323,7 @@ function Application() {
             await Axios.get(`${api_url}/api/aws/emr/cluster/gather/stats`,{
                       params: params, 
                   }).then((data)=>{
-                      //console.log(data);
                       setClusterStats(data.data); 
-                      
-                     
             })
             .catch((err) => {
                       console.log('Timeout API Call : /api/aws/emr/cluster/gather/stats' );
@@ -374,7 +335,7 @@ function Application() {
     }
     
     
-    //-- Function Node Gather Stats
+    //-- Function Gather Node Stats
     async function gatherNodeStats() {
         
             Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
@@ -389,7 +350,6 @@ function Application() {
             await Axios.get(`${api_url}/api/aws/emr/cluster/gather/node/metrics`,{
                       params: params, 
                   }).then((data)=>{
-                      console.log(data);
                       setNodeStats(data.data);
             })
             .catch((err) => {
@@ -401,9 +361,8 @@ function Application() {
     
     }
     
-    //-- Function Cluster Gather Steps
+    //-- Function Gather Cluster Steps
     async function gatherClusterSteps() {
-        
         
             Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
             var api_url = configuration["apps-settings"]["api-url"];
@@ -417,10 +376,7 @@ function Application() {
             await Axios.get(`${api_url}/api/aws/emr/cluster/gather/steps`,{
                       params: params, 
                   }).then((data)=>{
-                      
-                      console.log(data);
                       setClusterSteps(data.data.Steps);
-                      
             })
             .catch((err) => {
                       console.log('Timeout API Call : /api/aws/emr/cluster/gather/steps' );
@@ -432,24 +388,23 @@ function Application() {
     }
     
     
-    //-- Function Cluster Gather Information
+    //-- Function Gather Cluster Information
     async function gatherClusterInformation() {
     
         await gatherClusterStats();
+        
         if ( currentSubTabId.current == "tab02-05"  ) {
             await gatherClusterSteps();
         }
-    
     
         if ( splitPanelState.current === true  ) {
             await gatherNodeStats();
         }
         
         
-    
     }
     
-    //-- Call API to App Version
+    //-- Function Gather App Version
    async function gatherVersion (){
 
         //-- Application Update
@@ -473,7 +428,6 @@ function Application() {
    
    
    useEffect(() => {
-        //gatherVersion();
         gatherClusterData();
         const id = setInterval(gatherClusterInformation, configuration["apps-settings"]["refresh-interval-emr-cluster"]);
         return () => clearInterval(id);
@@ -481,9 +435,6 @@ function Application() {
     }, []);
     
    
-    
-    
-    
     
   return (
     <div>
@@ -640,9 +591,6 @@ function Application() {
                                         </td>
                                     </tr>
                                 </table>
-                        
-                        
-                                
                                 
                             </div>  
                         } 
@@ -1184,7 +1132,7 @@ function Application() {
                                             
                                           },
                                           {
-                                            label: "Instances",
+                                            label: "Instance Management",
                                             id: "tab02-06",
                                             content: 
                                                 <div style={{"padding-top" : "1em", "padding-bottom" : "1em"}}>
