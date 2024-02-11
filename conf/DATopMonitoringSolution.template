@@ -149,6 +149,11 @@ Resources:
                 			"Effect": "Allow",
                 			"Action": "elasticmapreduce:ListClusters",
                 			"Resource": "*"
+                		},
+                		{
+                			"Effect": "Allow",
+                			"Action": "timestream:Select",
+                			"Resource": "arn:aws:timestream:*:${AWS::AccountId}:database/*/table/*"
                 		}
                     ]
                 }
@@ -365,7 +370,7 @@ Resources:
     TimestreamTable:
         Type: "AWS::Timestream::Table"
         Properties:
-            DatabaseName: "emrdb1"
+            DatabaseName: !Ref TimestreamDatabase
             TableName: "cpu"
             RetentionProperties: 
                 MemoryStoreRetentionPeriodInHours: 24
@@ -374,7 +379,7 @@ Resources:
     TimestreamTable2:
         Type: "AWS::Timestream::Table"
         Properties:
-            DatabaseName: "emrdb1"
+            DatabaseName: !Ref TimestreamDatabase
             TableName: "disk"
             RetentionProperties: 
                 MemoryStoreRetentionPeriodInHours: 24
@@ -383,7 +388,7 @@ Resources:
     TimestreamTable3:
         Type: "AWS::Timestream::Table"
         Properties:
-            DatabaseName: "emrdb1"
+            DatabaseName: !Ref TimestreamDatabase
             TableName: "memory"
             RetentionProperties: 
                 MemoryStoreRetentionPeriodInHours: 24
@@ -392,7 +397,7 @@ Resources:
     TimestreamTable4:
         Type: "AWS::Timestream::Table"
         Properties:
-            DatabaseName: "emrdb1"
+            DatabaseName: !Ref TimestreamDatabase
             TableName: "network"
             RetentionProperties: 
                 MemoryStoreRetentionPeriodInHours: 24
@@ -401,7 +406,7 @@ Resources:
     TimestreamTable5:
         Type: "AWS::Timestream::Table"
         Properties:
-            DatabaseName: "emrdb1"
+            DatabaseName: !Ref TimestreamDatabase
             TableName: "hadoop"
             RetentionProperties: 
                 MemoryStoreRetentionPeriodInHours: 24
