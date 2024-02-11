@@ -73,7 +73,7 @@ export default function App() {
                           <TopNavigation
                                   i18nStrings={i18nStrings}
                                   identity={{
-                                    href: '#',
+                                    href: '/',
                                     title:  configuration['apps-settings']['application-title'] 
                                   }}
                                   utilities={[

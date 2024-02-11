@@ -70,11 +70,11 @@ function Home() {
                                       </Header>
                                       <br/>
                                       <Box fontSize="heading-s">
-                                          Gain Monitoring Insight and Take Action on AWS Database Resources.
+                                          Gain Monitoring Insight and Take Action on AWS Data Analytics Resources.
                                       </Box>
                                       <br/>
                                       <Box fontSize="heading-s">
-                                          View performance data for AWS Database instances and clusters, so you can quickly identify and act on any issues that might impact database resources.
+                                          View performance data for AWS Data Analytics Services, so you can quickly identify and act on any issues that might impact your resources.
                                       </Box>
                                       <br/>
                                   </>
@@ -97,13 +97,13 @@ function Home() {
                                       }
                                   >
                                         <div>
-                                                  <Badge>1</Badge> Connect to your AWS Database resorces.
+                                                  <Badge>1</Badge> Enable lightweight monitoring on your AWS resorces.
                                                   <br/>
                                                   <br/>
-                                                  <Badge>2</Badge> Gather realtime performance database metrics from engine itself.
+                                                  <Badge>2</Badge> Consolidate all your performance metrics into central repository.
                                                   <br/>
                                                   <br/>
-                                                  <Badge>3</Badge> Extract performance from AWS Cloudwatch metrics and Enhanced Monitoring.
+                                                  <Badge>3</Badge> Extract metadata from AWS Services using API Calls.
                                                   <br/>
                                                   <br/>
                                                   <Badge>4</Badge> Consolidate all information into centralized dashboard.
@@ -123,10 +123,10 @@ function Home() {
                                       >
                                             <div>
                                               <Box variant="p">
-                                                  Start connecting to your AWS RDS instances or Amazon Aurora, ElastiCache, MemoryDB, DocumentDB clusters.
+                                                  Start monitoring to your AWS EMR clusters.
                                               </Box>
                                               <br/>
-                                              <Button variant="primary" href="/rds/instances/" >Get Started</Button>
+                                              <Button variant="primary" href="/clusters/emr/" >Get Started</Button>
                                               <br/>
                                               <br/>
                                             </div>
