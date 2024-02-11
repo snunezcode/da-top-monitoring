@@ -564,6 +564,86 @@ class classEMRCluster {
             }
             
         }
+        
+        
+        //-- Get Node Metrics
+        async getNodeMetrics(object){
+            var result = {};
+            try {
+                
+                
+                var parameters = { cluster_id : this.objectProperties.clusterId, instance_id : object.instanceId };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['node']['metricsDetails'], parameters ) });
+            
+                var cpu = records.map(function (obj) {
+                    return [obj.time, obj.cpu_usage] ;
+                });
+                
+                var memory = records.map(function (obj) {
+                    return [obj.time, obj.memory_usage] ;
+                });
+                
+                var netSent = records.map(function (obj) {
+                    return [obj.time, obj.network_sent] ;
+                });
+                
+                var netRecv = records.map(function (obj) {
+                    return [obj.time, obj.network_recv] ;
+                });
+                
+                var diskReadBytes = records.map(function (obj) {
+                    return [obj.time, obj.disk_read_bytes] ;
+                });
+                
+                var diskWriteBytes = records.map(function (obj) {
+                    return [obj.time, obj.disk_write_bytes] ;
+                });
+                
+                var diskReadIops = records.map(function (obj) {
+                    return [obj.time, obj.disk_read_iops] ;
+                });
+                
+                var diskWriteIops = records.map(function (obj) {
+                    return [obj.time, obj.disk_write_iops] ;
+                });
+                
+                result = { 
+            
+                            cpuUsage : records[records.length-1]?.['cpu_usage'],
+                            memoryUsage : records[records.length-1]?.['memory_usage'],
+                            networkTotal : records[records.length-1]?.['network_bytes'],
+                            networkSent : records[records.length-1]?.['network_sent'],
+                            networkRecv : records[records.length-1]?.['network_recv'],
+                            diskIopsReads : records[records.length-1]?.['disk_read_iops'],
+                            diskIopsWrites : records[records.length-1]?.['disk_write_iops'],
+                            diskIops : records[records.length-1]?.['disk_iops'],
+                            diskBytesReads : records[records.length-1]?.['disk_read_bytes'],
+                            diskBytesWrites : records[records.length-1]?.['disk_write_bytes'],
+                            diskBytes : records[records.length-1]?.['disk_bytes'],
+                            charts : { 
+                                        cpu                 : cpu,
+                                        memory              : memory,
+                                        networkSent         : netSent,
+                                        networkRecv         : netRecv,
+                                        diskReadBytes       : diskReadBytes,
+                                        diskWriteBytes      : diskWriteBytes,
+                                        diskReadIops        : diskReadIops,
+                                        diskWriteIops       : diskWriteIops
+                            },
+                };
+                
+                
+            } catch(error) {
+                
+                this.#objLog.write("getClusterSteps","err",error);
+                
+            }
+            
+            return result;
+            
+        }
+        
+        
 
 }
 

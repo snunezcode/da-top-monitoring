@@ -340,6 +340,106 @@ module.exports = {
                                                             GROUP BY 
                                                                 cluster_id
                                                         `
+                            },
+                            "node" : {
+                                    "metricsDetails" : 
+                                                        `
+                                                        WITH vw_cpu AS (
+                                                            SELECT 
+                                                                instance_id,
+                                                                BIN(time, 10s ) as time,
+                                                                AVG(100-usage_idle) as cpu_usage
+                                                            FROM 
+                                                                emrdb.cpu
+                                                            WHERE 
+                                                                time between ago(15m) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
+                                                            GROUP BY 
+                                                                instance_id,BIN(time, 10s )
+                                                        ),
+                                                        vw_memory AS (
+                                                            SELECT 
+                                                                instance_id,
+                                                                BIN(time, 10s ) as time,
+                                                                AVG(used_percent) as memory_usage
+                                                            FROM 
+                                                                emrdb.memory
+                                                            WHERE 
+                                                                time between ago(15m) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
+                                                            GROUP BY 
+                                                                instance_id,BIN(time, 10s )
+                                                        ),
+                                                        vw_disk_level_1 AS (
+                                                            SELECT 
+                                                                    time, 
+                                                                    SUM(read_bytes_rate) as read_bytes,
+                                                                    SUM(write_bytes_rate) as write_bytes, 
+                                                                    SUM(reads_rate) as read_iops, 
+                                                                    SUM(writes_rate) as write_iops
+                                                            FROM 
+                                                                    emrdb.disk
+                                                            WHERE 
+                                                                    time between ago(15m) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
+                                                            GROUP BY 
+                                                                    time
+                                                        ),
+                                                        vw_disk AS (
+                                                            SELECT 
+                                                                    BIN(time, 10s ) as time,
+                                                                    AVG(read_bytes) as read_bytes,
+                                                                    AVG(write_bytes) as write_bytes,
+                                                                    AVG(read_iops) as read_iops,
+                                                                    AVG(write_iops) as write_iops
+                                                            FROM 
+                                                                    vw_disk_level_1
+                                                            GROUP BY 
+                                                                    BIN(time, 10s )
+                                                        ),
+                                                        vw_network_level_1 AS (
+                                                            SELECT 
+                                                                    time, 
+                                                                    SUM(bytes_sent_rate) as bytes_sent,
+                                                                    SUM(bytes_recv_rate) as bytes_recv
+                                                            FROM 
+                                                                    emrdb.network
+                                                            WHERE 
+                                                                    time between ago(15m) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
+                                                            GROUP BY 
+                                                                    time
+                                                        ),
+                                                        vw_network AS (
+                                                            SELECT 
+                                                                    BIN(time, 10s ) as time,
+                                                                    AVG(bytes_sent) as bytes_sent,
+                                                                    AVG(bytes_recv) as bytes_recv
+                                                            FROM 
+                                                                    vw_network_level_1
+                                                            GROUP BY 
+                                                                    BIN(time, 10s )
+                                                        )
+                                                        SELECT
+                                                            vw_cpu.time,
+                                                            vw_cpu.cpu_usage,
+                                                            vw_memory.memory_usage,
+                                                            vw_disk.read_bytes as disk_read_bytes,
+                                                            vw_disk.write_bytes as disk_write_bytes,
+                                                            vw_disk.read_iops as disk_read_iops,
+                                                            vw_disk.write_iops as disk_write_iops,
+                                                            (vw_disk.write_bytes + vw_disk.read_bytes) as disk_bytes,
+                                                            (vw_disk.write_iops + vw_disk.read_iops) as disk_iops,
+                                                            vw_network.bytes_sent as network_sent,
+                                                            vw_network.bytes_recv as network_recv,
+                                                            (vw_network.bytes_sent + vw_network.bytes_recv) as network_bytes
+                                                        FROM 
+                                                            vw_cpu, vw_memory, vw_disk, vw_network
+                                                        WHERE
+                                                            vw_cpu.time = vw_memory.time
+                                                            and
+                                                            vw_cpu.time = vw_disk.time
+                                                            and
+                                                            vw_cpu.time = vw_network.time
+                                                        ORDER BY 
+                                                            vw_cpu.time
+                                                        `
                             }
             }
 };

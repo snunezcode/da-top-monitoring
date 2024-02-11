@@ -16,7 +16,11 @@ import TextFilter from "@cloudscape-design/components/text-filter";
 
 import Table from "@cloudscape-design/components/table";
 import { StatusIndicator } from '@cloudscape-design/components';
+import { ColumnLayout } from '@cloudscape-design/components';
+import { Box } from '@cloudscape-design/components';
 import Flashbar from "@cloudscape-design/components/flashbar";
+
+
 
 import { SplitPanel } from '@cloudscape-design/components';
 import SpaceBetween from "@cloudscape-design/components/space-between";
@@ -268,15 +272,36 @@ function Application() {
                                         }
                                       }
                       >
-                            <table style={{"width":"100%", "padding": "1em"}}>
-                                <tr>  
-                                    <td style={{"width":"100%", "padding-left": "1em"}}>  
-                                        {selectedItems[0]?.['id']}
-                                    </td>
-                                </tr>
-                            </table>  
-                            
-                            
+                            <ColumnLayout columns="4" variant="text-grid">
+                             <div>
+                                  <Box variant="awsui-key-label">Cluster Identifier</Box>
+                                  {selectedItems[0]?.['id']}
+                              </div>
+                              <div>
+                                  <Box variant="awsui-key-label">Name</Box>
+                                  {selectedItems[0]?.['name']}
+                              </div>
+                              <div>
+                                  <Box variant="awsui-key-label">State</Box>
+                                  {selectedItems[0]?.['state']}
+                              </div>
+                              <div>
+                                  <Box variant="awsui-key-label">Creation Date</Box>
+                                  {selectedItems[0]?.['creationDate']}
+                              </div>
+                            </ColumnLayout>
+                            <br /> 
+                            <br />
+                            <ColumnLayout columns="4" variant="text-grid">
+                              <div>
+                                  <Box variant="awsui-key-label">Ready Date</Box>
+                                  {selectedItems[0]?.['readyDate']}
+                              </div>
+                              <div>
+                                  <Box variant="awsui-key-label">NormalizedInstanceHours</Box>
+                                  {selectedItems[0]?.['hours']}
+                              </div>
+                            </ColumnLayout>
                       </SplitPanel>
             }
             content={

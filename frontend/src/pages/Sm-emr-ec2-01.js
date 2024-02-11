@@ -27,7 +27,6 @@ import Container from "@cloudscape-design/components/container";
 import CustomHeader from "../components/Header";
 import { ColumnLayout } from '@cloudscape-design/components';
 import Tabs from "@cloudscape-design/components/tabs";
-import Multiselect from "@cloudscape-design/components/multiselect";
 
 
 
@@ -90,6 +89,10 @@ function Application() {
     //-- Split Panel
     const [splitPanelShow,setsplitPanelShow] = useState(false);
     const [splitPanelSize, setSplitPanelSize] = useState(400);
+    const splitPanelState = useRef(false);
+    
+    //-- Node Identfied
+    const currentInstanceIdentifier = useRef("");
     
     
     //-- Performance Information
@@ -255,6 +258,33 @@ function Application() {
     const [clusterSteps,setClusterSteps] = useState([]);
     
     
+    
+    //-- Node Stats
+    const [nodeStats,setNodeStats] = useState({
+                                                cpuUsage : 0,
+                                                memoryUsage : 0,
+                                                networkTotal : 0,
+                                                networkSent : 0,
+                                                networkRecv : 0,
+                                                diskIopsReads : 0,
+                                                diskIopsWrites : 0,
+                                                diskIops : 0,
+                                                diskBytesReads : 0,
+                                                diskBytesWrites : 0,
+                                                diskBytes : 0,
+                                                charts : { 
+                                                            cpu                 : [],
+                                                            memory              : [],
+                                                            networkSent         : [],
+                                                            networkRecv         : [],
+                                                            diskReadBytes       : [],
+                                                            diskWriteBytes      : [],
+                                                            diskReadIops        : [],
+                                                            diskWriteIops       : [],
+                                                },
+    });
+    
+    //-- Step Details
     const [selectedStepState,setSelectedStepState] = useState({
                                                                 label: "Running",
                                                                 value: "RUNNING"
@@ -344,6 +374,33 @@ function Application() {
     }
     
     
+    //-- Function Node Gather Stats
+    async function gatherNodeStats() {
+        
+            Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
+            var api_url = configuration["apps-settings"]["api-url"];
+            
+            var params = {
+                clusterId : parameter_object_values["clusterId"],
+                instanceId : currentInstanceIdentifier.current,
+                engineType : parameter_object_values["engine"]
+            };
+            
+            await Axios.get(`${api_url}/api/aws/emr/cluster/gather/node/metrics`,{
+                      params: params, 
+                  }).then((data)=>{
+                      console.log(data);
+                      setNodeStats(data.data);
+            })
+            .catch((err) => {
+                      console.log('Timeout API Call : /api/aws/emr/cluster/gather/node/metrics' );
+                      console.log(err);
+                      
+            });
+          
+    
+    }
+    
     //-- Function Cluster Gather Steps
     async function gatherClusterSteps() {
         
@@ -383,6 +440,12 @@ function Application() {
             await gatherClusterSteps();
         }
     
+    
+        if ( splitPanelState.current === true  ) {
+            await gatherNodeStats();
+        }
+        
+        
     
     }
     
@@ -432,7 +495,7 @@ function Application() {
             contentType="default"
             splitPanelOpen={splitPanelShow}
             splitPanelOpen={splitPanelShow}
-            onSplitPanelToggle={() => setsplitPanelShow(false)}
+            onSplitPanelToggle={() => { setsplitPanelShow(false); splitPanelState.current = false; }}
             onSplitPanelResize={
                                 ({ detail: { size } }) => {
                                  setSplitPanelSize(size);
@@ -441,7 +504,7 @@ function Application() {
             splitPanelSize={splitPanelSize}
             splitPanel={
                       <SplitPanel  
-                                    header={"Resource : " + "" } 
+                                    header={"Instance identifier : " + currentInstanceIdentifier.current } 
                                     i18nStrings={splitPanelI18nStrings} 
                                     closeBehavior="hide"
                                     onSplitPanelToggle={({ detail }) => {
@@ -455,12 +518,132 @@ function Application() {
                             <div>  
                                 <table style={{"width":"100%", "padding": "1em"}}>
                                     <tr>  
-                                        <td valign="top" style={{ "width":"100%"}}>
-                                                
-                                          
+                                        <td style={{ "width":"10%", "text-align" : "center"}}>
+                                            <ChartRadialBar01 
+                                                series={JSON.stringify([Math.round(nodeStats['cpuUsage']) || 0 ])} 
+                                                height="180px" 
+                                                title={"CPU"}
+                                            />
+                                        </td>
+                                        <td style={{ "width":"40%", "padding-right": "2em"}}>
+                                                <ChartLine04 series={JSON.stringify([
+                                                           { name : "cpu", data : nodeStats['charts']?.['cpu'] }
+                                                        ])} 
+                                                        title={"CPU Usage(%)"} height="220px" 
+                                                />
+                                        </td>
+                                        <td style={{ "width":"10%", "text-align" : "center", "border-left": "1px solid " + configuration.colors.lines.separator100}}>
+                                            <ChartRadialBar01 
+                                                series={JSON.stringify([Math.round(nodeStats['memoryUsage']) || 0 ])} 
+                                                height="180px" 
+                                                title={"Memory"}
+                                            />
+                                        </td>
+                                        <td style={{ "width":"40%", "padding-right": "2em"}}>
+                                                <ChartLine04 series={JSON.stringify([
+                                                           { name : "cpu", data : nodeStats['charts']?.['memory'] }
+                                                        ])} 
+                                                        title={"Memory Usage(%)"} height="220px" 
+                                                />
                                         </td>
                                     </tr>
                                 </table>
+                                <br/>
+                                <br/>  
+                                <table style={{"width":"100%"}}>  
+                                    <tr>  
+                                        <td style={{ "width":"10%", "text-align" : "center"}}>
+                                            <CompMetric01 
+                                                value={nodeStats['networkTotal']|| 0}
+                                                title={"Total/sec"}
+                                                precision={0}
+                                                format={2}
+                                                fontColorValue={configuration.colors.fonts.metric100}
+                                                fontSizeValue={"22px"}
+                                            />
+                                            <br/>
+                                            <table  style={{ "width":"100%"}}>
+                                                <tr>
+                                                    <td style={{ "width":"50%", "text-align" : "center"}}>
+                                                        <CompMetric01 
+                                                            value={nodeStats['networkSent']|| 0}
+                                                            title={"Sent/sec"}
+                                                            precision={0}
+                                                            format={2}
+                                                            fontColorValue={configuration.colors.fonts.metric100}
+                                                            fontSizeValue={"16px"}
+                                                        />
+                                                    </td>
+                                                    <td style={{ "width":"50%", "text-align" : "center"}}>
+                                                        <CompMetric01 
+                                                            value={nodeStats['networkRecv']|| 0}
+                                                            title={"Recv/sec"}
+                                                            precision={0}
+                                                            format={2}
+                                                            fontColorValue={configuration.colors.fonts.metric100}
+                                                            fontSizeValue={"16px"}
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td style={{ "width":"40%", "padding-right": "2em"}}>
+                                                <ChartLine04 series={JSON.stringify([
+                                                           { name : "networkSent/sec", data : nodeStats['charts']?.['networkSent'] },
+                                                           { name : "networkRecv/sec", data : nodeStats['charts']?.['networkRecv'] }
+                                                        ])} 
+                                                        title={"Network Throughtput"} height="220px" 
+                                                />
+                                        </td>
+                                        <td style={{ "width":"10%", "text-align" : "center", "border-left": "1px solid " + configuration.colors.lines.separator100}}>
+                                            <CompMetric01 
+                                                value={nodeStats['diskBytes']|| 0}
+                                                title={"Total/sec"}
+                                                precision={0}
+                                                format={2}
+                                                fontColorValue={configuration.colors.fonts.metric100}
+                                                fontSizeValue={"22px"}
+                                            />
+                                            <br/>
+                                            <table  style={{ "width":"100%"}}>
+                                                <tr>
+                                                    <td style={{ "width":"50%", "text-align" : "center"}}>
+                                                        <CompMetric01 
+                                                            value={nodeStats['diskBytesReads']|| 0}
+                                                            title={"Reads/sec"}
+                                                            precision={0}
+                                                            format={2}
+                                                            fontColorValue={configuration.colors.fonts.metric100}
+                                                            fontSizeValue={"16px"}
+                                                        />
+                                                    </td>
+                                                    <td style={{ "width":"50%", "text-align" : "center"}}>
+                                                        <CompMetric01 
+                                                            value={nodeStats['diskBytesWrites']|| 0}
+                                                            title={"Writes/sec"}
+                                                            precision={0}
+                                                            format={2}
+                                                            fontColorValue={configuration.colors.fonts.metric100}
+                                                            fontSizeValue={"16px"}
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td style={{ "width":"40%", "padding-right": "2em"}}>
+                                                <ChartLine04 series={JSON.stringify([
+                                                           { name : "ReadDiskThroughtput/sec", data : nodeStats['charts']?.['diskReadBytes'] },
+                                                           { name : "WriteDiskThroughtput/sec", data : nodeStats['charts']?.['diskWriteBytes'] }
+                                                        ])} 
+                                                        title={"Disk Throughtput"} height="220px" 
+                                                />
+                                        </td>
+                                    </tr>
+                                </table>
+                        
+                        
+                                
+                                
                             </div>  
                         } 
                         
@@ -969,9 +1152,11 @@ function Application() {
                                                                 description={""}
                                                                 pageSize={20}
                                                                 onSelectionItem={( item ) => {
-                                                                    //resourceName.current = item[0]?.["GlobalSecondaryIndexName"];
-                                                                    //setsplitPanelShow(true);
-                                                                    //gatherResourceDetails();
+                                                                    /*
+                                                                    currentInstanceIdentifier.current = item[0]?.["instance_id"];
+                                                                    setsplitPanelShow(true);
+                                                                    gatherNodeStats();
+                                                                    */
                                                                   }
                                                                 }
                                                                 extendedTableProperties = {
@@ -1040,9 +1225,10 @@ function Application() {
                                         description={""}
                                         pageSize={20}
                                         onSelectionItem={( item ) => {
-                                            //resourceName.current = item[0]?.["GlobalSecondaryIndexName"];
-                                            //setsplitPanelShow(true);
-                                            //gatherResourceDetails();
+                                                                    currentInstanceIdentifier.current = item[0]?.["instance_id"];
+                                                                    splitPanelState.current = true;
+                                                                    setsplitPanelShow(true);
+                                                                    gatherNodeStats();
                                           }
                                         }
                                         extendedTableProperties = {
