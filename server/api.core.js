@@ -58,12 +58,13 @@ gatherPemKeys(issCognitoIdp);
 //   ---------------------------------------- SCHEDULER
 //--#################################################################################################### 
 
+/*
 function scheduleJob5s(){
     
     var timestamp = new Date();
     console.log({ time : timestamp.toTimeString().split(' ')[0], message : "5s - Scheduler" });
     
-    //-- Elasticache
+    //-- EMR
     for (let engineId of Object.keys(emrObjectContainer)) {
             emrObjectContainer[engineId].refreshData();
     }
@@ -71,11 +72,9 @@ function scheduleJob5s(){
     
 }
 
-scheduleObjects['5s'] = schedule.scheduleJob('*/5 * * * * *', function(){
-                                            scheduleJob5s();
-                                            });
-            
+//scheduleObjects['5s'] = schedule.scheduleJob('* /5 * * * * *', function(){scheduleJob5s();});
 
+*/
 
 
 //--################################################################################################################
@@ -270,7 +269,7 @@ app.get("/api/aws/emr/cluster/gather/stats", async (req, res) => {
         try
             {
                 var params = req.query;
-                var clusterData = emrObjectContainer[params.engineType + ":" + params.clusterId].getClusterData();
+                var clusterData = await emrObjectContainer[params.engineType + ":" + params.clusterId].getClusterData();
                 res.status(200).send({ ... clusterData });
                 
         }

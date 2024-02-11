@@ -476,7 +476,6 @@ class classEMRCluster {
                 
                 this.#clusterStats = { 
                                         ...this.#clusterStats, 
-                                        
                                         lastUpdate : new Date().toTimeString().split(' ')[0],
                                         host : {
                                                     ...{
@@ -526,8 +525,10 @@ class classEMRCluster {
         }
         
         //-- Get Cluster Information
-        getClusterData(){
+        async getClusterData(){
             try {
+                
+                await this.refreshData();
                 
                 return {
                         ...this.#clusterStats,
