@@ -1,6 +1,6 @@
 #!/bin/bash
 #Verify code version
-version="$(curl https://version.code.ds.wwcs.aws.dev/?codeId=dbtop'&'moduleId=deploy)"
+version="$(curl https://version.code.ds.wwcs.aws.dev/?codeId=datop'&'moduleId=deploy)"
 
 #Install Software Packages
 # Bug : https://github.com/amazonlinux/amazon-linux-2023/issues/397
