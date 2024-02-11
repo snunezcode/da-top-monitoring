@@ -395,7 +395,7 @@ class classEMRCluster {
                 //+++++++ SECTION 5 : Gather Cluster Performance Information over time
                 
                     
-                var parameters = { cluster_id : this.objectProperties.clusterId };
+                var parameters = { cluster_id : this.objectProperties.clusterId, period : '15m' };
                 var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['clusterHostSummary'], parameters ) });
             
                  
@@ -468,7 +468,7 @@ class classEMRCluster {
                 
                 //+++++++ SECTION 6 : Gather Hadoop Performance (Table)
                 
-                var parameters = { cluster_id : this.objectProperties.clusterId };
+                var parameters = { cluster_id : this.objectProperties.clusterId, period : '5m' };
                 var hadoopSummary = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['clusterHadoopSummary'], parameters ) });
                 
                 
@@ -572,7 +572,7 @@ class classEMRCluster {
             try {
                 
                 
-                var parameters = { cluster_id : this.objectProperties.clusterId, instance_id : object.instanceId };
+                var parameters = { cluster_id : this.objectProperties.clusterId, instance_id : object.instanceId, period : '15m' };
                 var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['node']['metricsDetails'], parameters ) });
             
                 var cpu = records.map(function (obj) {

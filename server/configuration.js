@@ -132,7 +132,7 @@ module.exports = {
                                                             FROM 
                                                                 emrdb.cpu
                                                             WHERE 
-                                                                time between ago(15m) and now() and cluster_id = '{cluster_id}'
+                                                                time between ago({period}) and now() and cluster_id = '{cluster_id}'
                                                             GROUP BY 
                                                                 cluster_id,BIN(time, 10s )
                                                         ),
@@ -146,7 +146,7 @@ module.exports = {
                                                             FROM 
                                                                 emrdb.memory
                                                             WHERE 
-                                                                time between ago(15m) and now() and cluster_id = '{cluster_id}'
+                                                                time between ago({period}) and now() and cluster_id = '{cluster_id}'
                                                             GROUP BY 
                                                                 cluster_id,BIN(time, 10s )
                                                         ),
@@ -162,7 +162,7 @@ module.exports = {
                                                             FROM 
                                                                     emrdb.disk
                                                             WHERE 
-                                                                    time between ago(60m) and now() and cluster_id = '{cluster_id}'
+                                                                    time between ago({period}) and now() and cluster_id = '{cluster_id}'
                                                             GROUP BY 
                                                                     time,
                                                                     cluster_id,
@@ -219,7 +219,7 @@ module.exports = {
                                                             FROM 
                                                                     emrdb.network
                                                             WHERE 
-                                                                    time between ago(60m) and now() and cluster_id = '{cluster_id}'
+                                                                    time between ago({period}) and now() and cluster_id = '{cluster_id}'
                                                             GROUP BY 
                                                                     time,
                                                                     cluster_id,
@@ -336,7 +336,7 @@ module.exports = {
                                                             FROM 
                                                                 emrdb.hadoop
                                                             WHERE 
-                                                                time between ago(5m) and now() and cluster_id = '{cluster_id}'
+                                                                time between ago({period}) and now() and cluster_id = '{cluster_id}'
                                                             GROUP BY 
                                                                 cluster_id
                                                         `
@@ -352,7 +352,7 @@ module.exports = {
                                                             FROM 
                                                                 emrdb.cpu
                                                             WHERE 
-                                                                time between ago(15m) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
+                                                                time between ago({period}) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
                                                             GROUP BY 
                                                                 instance_id,BIN(time, 10s )
                                                         ),
@@ -364,7 +364,7 @@ module.exports = {
                                                             FROM 
                                                                 emrdb.memory
                                                             WHERE 
-                                                                time between ago(15m) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
+                                                                time between ago({period}) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
                                                             GROUP BY 
                                                                 instance_id,BIN(time, 10s )
                                                         ),
@@ -378,7 +378,7 @@ module.exports = {
                                                             FROM 
                                                                     emrdb.disk
                                                             WHERE 
-                                                                    time between ago(15m) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
+                                                                    time between ago({period}) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
                                                             GROUP BY 
                                                                     time
                                                         ),
@@ -402,7 +402,7 @@ module.exports = {
                                                             FROM 
                                                                     emrdb.network
                                                             WHERE 
-                                                                    time between ago(15m) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
+                                                                    time between ago({period}) and now() and cluster_id = '{cluster_id}' and instance_id = '{instance_id}'
                                                             GROUP BY 
                                                                     time
                                                         ),
