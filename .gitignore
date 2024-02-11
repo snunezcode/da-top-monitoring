@@ -1,3 +1,9 @@
+demo/
+frontend/node_modules/
+frontend/public/aws-exports.json
+server/node_modules/
+server/aws-exports.json
+
 # Logs
 logs
 *.log
