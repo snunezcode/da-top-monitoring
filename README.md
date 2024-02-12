@@ -24,11 +24,6 @@ Based on same simplicity concept of Unix top utility, provide quick and fast vie
 ### [Visit the YouTube channel for videos](https://www.youtube.com/@ADTopMonitoringSolution)
 
 
-## How it works?
-
-<img width="1089" alt="image" src="./images/image05.png">
-
-
 
 ## AWS Services Support
 
@@ -48,7 +43,7 @@ ADTop Monitoring Solution currently supports following database services:
 
 ## Architecture
 
-<img width="1023" alt="image" src="./images/image06.png">
+<img width="1023" alt="image" src="./docs/da-top-04.png">
 
 
 
@@ -99,7 +94,7 @@ ADTop Monitoring Solution will use following resources:
 Follow the step-by-step instructions to configure and deploy the ADTop Monitoring Solution into your account.
 
 1. Make sure you have sign in AWS Console already.
-2. Download AWS Cloudformation Template ([DBMonitoringSolution.template](https://raw.githubusercontent.com/aws-samples/ad-top-monitoring/main/conf/ADTopMonitoringSolution.template)) located into conf folder.
+2. Download AWS Cloudformation Template ([ADMonitoringSolution.template](https://raw.githubusercontent.com/aws-samples/ad-top-monitoring/main/conf/ADTopMonitoringSolution.template)) located into conf folder.
 3. [**Open AWS CloudFormation Console**](https://console.aws.amazon.com/cloudformation/home#/stacks/create/template?stackName=ADTopMonitoringSolution)
 4. Create an stack using Cloudformation template ([DBMonitoringSolution.template](/conf/DBMonitoringSolution.template)) already downloaded on step 2.
 5. Input **Stack name** parameter. 
