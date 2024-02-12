@@ -66,7 +66,7 @@ ADTop Monitoring Solution currently supports following database services:
 
 ADTop Monitoring Solution requires following resources:
 
-- **[Amazon EMR](https://aws.amazon.com/emr/), requires add bootstraping script step to configure monitoring agent to collect metrics and send to central repository. 
+- **[Amazon EMR]**(https://aws.amazon.com/emr/), requires add bootstraping script step to configure monitoring agent to collect metrics and send to central repository. 
     Configuration script (emr.setup.sh)(https://github.com/snunezcode/da-top-monitoring/blob/master/conf/emr.setup.sh) is located int conf directory.
 
 
