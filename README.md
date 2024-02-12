@@ -61,7 +61,6 @@ ADTop Monitoring Solution currently supports following database services:
     Identify top consumer resources, gather performance metrics and resource usages.
 
 
-
 ## Solution Requirements
 
 ADTop Monitoring Solution requires following resources:
