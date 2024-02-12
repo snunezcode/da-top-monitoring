@@ -66,7 +66,7 @@ ADTop Monitoring Solution currently supports following database services:
 ADTop Monitoring Solution requires following resources:
 
 - **[Amazon EMR]**. Require [Telegraf OpenSource Agent](https://github.com/influxdata/telegraf) to collect performance metrics. Add bootstraping step to configure the agent to send metrics to central repository. 
-    Configuration script [emr.setup.sh](https://github.com/snunezcode/da-top-monitoring/blob/master/conf/emr.setup.sh) is located into conf directory.
+    Configuration script [emr.setup.sh](https://github.com/snunezcode/da-top-monitoring/blob/master/conf/emr.setup.sh) is located into [conf](../conf/) directory.
 
 
 ## Resource Usage and Cost
