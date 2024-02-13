@@ -247,7 +247,9 @@ Resources:
                     
                     cat <<EOF | sudo tee /aws/apps/conf/update.sh
                     #Clone Repository
+                    source $HOME/.bash_profile
                     cd /tmp
+                    rm -rf da-top-monitoring
                     git clone https://github.com/${GitHubRepository}/da-top-monitoring.git
                     cd da-top-monitoring
                     sudo cp -r server frontend conf /aws/apps
@@ -263,6 +265,8 @@ Resources:
                     
                     #Re-Start API Services
                     sudo service api.core restart
+                    
+                    cat /aws/apps/frontend/public/version.json
                     
                     EOF
 
