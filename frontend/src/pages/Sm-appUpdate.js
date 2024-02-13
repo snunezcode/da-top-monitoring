@@ -1,27 +1,17 @@
 import { useState,useEffect } from 'react'
 import Axios from 'axios'
 import { configuration, SideMainLayoutHeader,SideMainLayoutMenu } from './Configs';
-import { createSearchParams } from "react-router-dom";
 
-import { applicationVersionUpdate, gatherLocalVersion, getMatchesCountText, paginationLabels, pageSizePreference, EmptyState } from '../components/Functions';
+import { applicationVersionUpdate, gatherLocalVersion } from '../components/Functions';
 import { createLabelFunction } from '../components/Functions';
 
 import SideNavigation from '@cloudscape-design/components/side-navigation';
 import AppLayout from '@cloudscape-design/components/app-layout';
 
-import { useCollection } from '@cloudscape-design/collection-hooks';
-import {CollectionPreferences,Pagination } from '@cloudscape-design/components';
-import TextFilter from "@cloudscape-design/components/text-filter";
-
-import Table from "@cloudscape-design/components/table";
-import { StatusIndicator } from '@cloudscape-design/components';
-import { ColumnLayout } from '@cloudscape-design/components';
-import { Box } from '@cloudscape-design/components';
 import Flashbar from "@cloudscape-design/components/flashbar";
 import Container from "@cloudscape-design/components/container";
 import Spinner from "@cloudscape-design/components/spinner";
 
-import { SplitPanel } from '@cloudscape-design/components';
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import Button from "@cloudscape-design/components/button";
 import CustomHeader from "../components/Header";
@@ -44,12 +34,9 @@ export const splitPanelI18nStrings: SplitPanelProps.I18nStrings = {
 };
 
 
-//-- Encryption
-var CryptoJS = require("crypto-js");
 
 function Application() {
-
-    
+  
     //-- Application Version
     const [versionMessage, setVersionMessage] = useState([]);
     const [messages, setMessages] = useState([]);
@@ -180,7 +167,7 @@ function Application() {
                     <Flashbar items={versionMessage} />
                     
                     <br/>
-                    <Container header={<Header variant="h2" description="This module will update the application to last version available, click on update button to start the process.">
+                    <Container header={<Header variant="h2" description="This module will update the application to latest version available, click update button to start the process.">
                                            { ( updateStatus['status'] == 'in-progress' )  &&
                                                 <Spinner size="big" />
                                             }

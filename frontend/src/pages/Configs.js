@@ -43,7 +43,7 @@ export const SideMainLayoutMenu = [
     {
           type: "link",
           text: "Documentation",
-          href: "https://github.com/snunezcode/db-workload-tool/",
+          href: "https://github.com/snunezcode/da-monitoring-solution/",
           external: true,
           externalIconAriaLabel: "Opens in a new tab"
     },
