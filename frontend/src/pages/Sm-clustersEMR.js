@@ -302,7 +302,6 @@ function Application() {
             content={
                 
                 <div style={{"padding" : "2em"}}>
-                    <Flashbar items={versionMessage} />
                     <Table
                           {...collectionProps}
                           selectionType="single"
