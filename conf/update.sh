@@ -4,7 +4,7 @@ cd /tmp
 sudo rm -rf da-top-monitoring
 git clone https://github.com/GitHubRepository/da-top-monitoring.git
 cd da-top-monitoring
-sudo cp -r server frontend conf /aws/apps
+sudo cp -r server frontend /aws/apps
 
 #React Application Installation
 cd /aws/apps/frontend/; npm install; npm run build;
