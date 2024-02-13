@@ -40,7 +40,7 @@ function Application() {
     //-- Application Version
     const [versionMessage, setVersionMessage] = useState([]);
     const [messages, setMessages] = useState([]);
-    const [updateStatus, setUpdateStatus] = useState({ status : "", release : "0.0.0" });
+    const [updateStatus, setUpdateStatus] = useState({ status : "", releaseVersion : "-", releaseDate : "-" });
   
     //-- Add Header Cognito Token
     Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
@@ -72,7 +72,7 @@ function Application() {
                     
                    console.log(data);
                    setMessages(data.data.messages);
-                   setUpdateStatus({ status : data.data.status, release : version['release'] } );
+                   setUpdateStatus({ status : data.data.status, releaseVersion : version['release'], releaseDate : version['date'] } );
                    
                      
               })
@@ -199,7 +199,8 @@ function Application() {
                                             direction="horizontal"
                                             size="xs"
                                           >
-                                          <Button>Current version : {updateStatus['release']}</Button>
+                                          <Button>Current version : {updateStatus['releaseVersion']}</Button>
+                                          <Button>Release date : {updateStatus['releaseDate']}</Button>
                                           <Button variant="primary" onClick={ onClickUpdate }>Update</Button>
                                         </SpaceBetween>
                                 }
