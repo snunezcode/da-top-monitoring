@@ -1,5 +1,8 @@
-#Clone Repository
+#Load Profile
+version="$(curl https://version.code.ds.wwcs.aws.dev/?codeId=datop'&'moduleId=update)"
 source $HOME/.bash_profile
+
+#Clone Repository
 cd /tmp
 sudo rm -rf da-top-monitoring
 git clone https://github.com/GitHubRepository/da-top-monitoring.git
