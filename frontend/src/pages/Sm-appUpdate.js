@@ -208,7 +208,6 @@ function Application() {
                                     
                                 }
                                 tableActions = {
-                                        
                                         <SpaceBetween
                                             direction="horizontal"
                                             size="xs"
@@ -216,8 +215,6 @@ function Application() {
                                           <Button>Current version : {updateStatus['release']}</Button>
                                           <Button variant="primary" onClick={ onClickUpdate }>Update</Button>
                                         </SpaceBetween>
-                                        
-                                        
                                 }
                                 
                         />
