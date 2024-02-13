@@ -1,4 +1,5 @@
 #Clone Repository
+source $HOME/.bash_profile
 cd /tmp
 rm -rf da-top-monitoring
 git clone https://github.com/snunezcode/da-top-monitoring.git
