@@ -1,8 +1,8 @@
 #Clone Repository
 source $HOME/.bash_profile
 cd /tmp
-rm -rf da-top-monitoring
-git clone https://github.com/snunezcode/da-top-monitoring.git
+sudo rm -rf da-top-monitoring
+git clone https://github.com/GitHubRepository/da-top-monitoring.git
 cd da-top-monitoring
 sudo cp -r server frontend conf /aws/apps
 
