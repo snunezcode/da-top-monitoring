@@ -1,5 +1,8 @@
+
+
 const { classEMRCluster } = require('./class.core.js');
 const { classAWS } = require('./class.aws.js');
+const { classApplicationUpdate } = require('./class.update.js');
 const AWSObject = new classAWS();
 
 //-- Engine Objects
@@ -42,6 +45,8 @@ var issCognitoIdp = "https://cognito-idp." + configData.aws_region + ".amazonaws
 var secretKey =  crypto.randomBytes(32).toString('hex')
 
 
+//-- Application Update
+var applicationUpdate = new classApplicationUpdate();
 
 //-- Scheduler
 const schedule = require('node-schedule');
@@ -393,6 +398,55 @@ app.get("/api/aws/emr/cluster/list", async (req, res) => {
     } catch(error) {
         console.log(error);
         res.status(401).send({ Clusters : []});
+    }
+    
+});
+
+
+//--++ API : GENERAL : Application Update
+app.get("/api/aws/application/update/start", async (req, res) => {
+
+    // Token Validation
+    var cognitoToken = verifyTokenCognito(req.headers['x-token-cognito']);
+
+    if (cognitoToken.isValid === false)
+        return res.status(511).send({ data: [], message : "Token is invalid"});
+ 
+    const params = req.query;
+   
+    
+    try {
+        
+        applicationUpdate.startUpdate();
+        res.status(200).send({ csrfToken: req.csrfToken(), status : "started"} )
+        
+    } catch(error) {
+        console.log(error);
+        res.status(401).send({});
+    }
+    
+});
+
+
+//--++ API : GENERAL : Application Update
+app.get("/api/aws/application/update/status", async (req, res) => {
+
+    // Token Validation
+    var cognitoToken = verifyTokenCognito(req.headers['x-token-cognito']);
+
+    if (cognitoToken.isValid === false)
+        return res.status(511).send({ data: [], message : "Token is invalid"});
+ 
+    const params = req.query;
+   
+    
+    try {
+        
+        res.status(200).send({ csrfToken: req.csrfToken(), status : applicationUpdate.status, messages : applicationUpdate.getUpdateLog() } )
+        
+    } catch(error) {
+        console.log(error);
+        res.status(401).send({});
     }
     
 });

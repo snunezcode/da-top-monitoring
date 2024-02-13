@@ -47,6 +47,7 @@ export const SideMainLayoutMenu = [
           external: true,
           externalIconAriaLabel: "Opens in a new tab"
     },
+    { type: "link", text: "Updates", href: "/updates" },
      
   ];
 
