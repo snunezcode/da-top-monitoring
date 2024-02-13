@@ -403,7 +403,7 @@ app.get("/api/aws/emr/cluster/list", async (req, res) => {
 });
 
 
-//--++ API : GENERAL : Application Update
+//--++ API : GENERAL : Application Update - Start
 app.get("/api/aws/application/update/start", async (req, res) => {
 
     // Token Validation
@@ -412,8 +412,6 @@ app.get("/api/aws/application/update/start", async (req, res) => {
     if (cognitoToken.isValid === false)
         return res.status(511).send({ data: [], message : "Token is invalid"});
  
-    const params = req.query;
-   
     
     try {
         
@@ -428,7 +426,7 @@ app.get("/api/aws/application/update/start", async (req, res) => {
 });
 
 
-//--++ API : GENERAL : Application Update
+//--++ API : GENERAL : Application Update - Status
 app.get("/api/aws/application/update/status", async (req, res) => {
 
     // Token Validation
@@ -437,9 +435,6 @@ app.get("/api/aws/application/update/status", async (req, res) => {
     if (cognitoToken.isValid === false)
         return res.status(511).send({ data: [], message : "Token is invalid"});
  
-    const params = req.query;
-   
-    
     try {
         
         res.status(200).send({ csrfToken: req.csrfToken(), status : applicationUpdate.status, messages : applicationUpdate.getUpdateLog() } )

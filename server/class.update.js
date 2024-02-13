@@ -23,7 +23,6 @@ class classApplicationUpdate {
             objectShell.stdout.on('data', (data)=>{
                     if (data !== "") {
                         this.logging.unshift({ timestamp : new Date().toLocaleString(), message : data });
-                        console.log(data); 
                         this.status = "in-progress";
                     }
             });
@@ -31,23 +30,22 @@ class classApplicationUpdate {
             objectShell.stderr.on('data', (data)=>{
                     if (data !== "") {
                         this.logging.unshift({ timestamp : new Date().toLocaleString(), message : data });
-                        console.error(data);
                         this.status = "in-progress";
                     }
             });
             
             objectShell.on('close', (code) => {
-              console.log(`child process exited with code ${code}`);
               this.status = "completed";
             });
             
-            
-            
-
         }
         
+        
+        //-- Get Update Status
         getUpdateLog(){
+            
             return this.logging;
+            
         }
         
         
