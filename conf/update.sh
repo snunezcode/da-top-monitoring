@@ -18,10 +18,9 @@ cp -r /aws/apps/frontend/build/* /aws/apps/frontend/www/
 #NodeJS API Core Installation
 cd /aws/apps/server/; npm install;
 
+#Re-Start API Services
 cat /aws/apps/frontend/public/version.json
 echo "Restarting the API Service..."
 sleep 10
-
-#Re-Start API Services
 sudo service api.core restart
 
