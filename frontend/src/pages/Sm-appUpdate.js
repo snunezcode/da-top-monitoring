@@ -3,7 +3,7 @@ import Axios from 'axios'
 import { configuration, SideMainLayoutHeader,SideMainLayoutMenu } from './Configs';
 import { createSearchParams } from "react-router-dom";
 
-import { applicationVersionUpdate, getMatchesCountText, paginationLabels, pageSizePreference, EmptyState } from '../components/Functions';
+import { applicationVersionUpdate, gatherLocalVersion, getMatchesCountText, paginationLabels, pageSizePreference, EmptyState } from '../components/Functions';
 import { createLabelFunction } from '../components/Functions';
 
 import SideNavigation from '@cloudscape-design/components/side-navigation';
@@ -53,7 +53,7 @@ function Application() {
     //-- Application Version
     const [versionMessage, setVersionMessage] = useState([]);
     const [messages, setMessages] = useState([]);
-    const [updateStatus, setUpdateStatus] = useState("");
+    const [updateStatus, setUpdateStatus] = useState({ status : "", release : "0.0.0" });
   
     //-- Add Header Cognito Token
     Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
@@ -73,6 +73,8 @@ function Application() {
    //-- Gather Import Process
    async function gatherApplicationUpdateStatus (){
      
+      var version = await gatherLocalVersion();
+      
       try {
         
             var api_url = configuration["apps-settings"]["api-url"];
@@ -83,7 +85,7 @@ function Application() {
                     
                    console.log(data);
                    setMessages(data.data.messages);
-                   setUpdateStatus(data.data.status);
+                   setUpdateStatus({ status : data.data.status, release : version['release'] } );
                    
                      
               })
@@ -179,7 +181,7 @@ function Application() {
                     
                     <br/>
                     <Container header={<Header variant="h2" description="This module will update the application to last version available, click on update button to start the process.">
-                                           { ( updateStatus == 'in-progress' )  &&
+                                           { ( updateStatus['status'] == 'in-progress' )  &&
                                                 <Spinner size="big" />
                                             }
                                             Application Updates
@@ -206,7 +208,16 @@ function Application() {
                                     
                                 }
                                 tableActions = {
-                                        <Button variant="primary" onClick={ onClickUpdate }>Update</Button>
+                                        
+                                        <SpaceBetween
+                                            direction="horizontal"
+                                            size="xs"
+                                          >
+                                          <Button>Current version : {updateStatus['release']}</Button>
+                                          <Button variant="primary" onClick={ onClickUpdate }>Update</Button>
+                                        </SpaceBetween>
+                                        
+                                        
                                 }
                                 
                         />
