@@ -396,7 +396,7 @@ function Application() {
                                         </td>
                                         <td style={{ "width":"25%", "text-align" : "center"}}>
                                             
-                                            <Box variant="h2">CPU Usage</Box>
+                                            <Box variant="h3">CPU Usage</Box>
                                             <table style={{"width":"100%", "padding": "1em"}}>
                                                 <tr>  
                                                     <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
@@ -450,7 +450,7 @@ function Application() {
                                         </td>
                                         
                                         <td style={{ "width":"25%", "text-align" : "center"}}>
-                                            <Box variant="h2">Memory Usage</Box>
+                                            <Box variant="h3">Memory Usage</Box>
                                             <table style={{"width":"100%", "padding": "1em"}}>
                                                 <tr>  
                                                     <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
@@ -504,7 +504,7 @@ function Application() {
                                         </td>
                                     </tr>
                                 </table>
-                                <ExpandableSection headerText="Widgets Options">
+                                <ExpandableSection headerText="Widget Selection">
                                     <table style={{"width":"100%", "padding": "1em"}}>
                                         <tr>  
                                             <td style={{ "width":"100%", "text-align" : "center"}}>
