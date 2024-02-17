@@ -83,7 +83,7 @@ const CustomComponent = memo(({ value = undefined, onChangeDateSelection = () =>
                         */
                       }}
                       value={value}
-                      placeholder="Filter by a date and time range"
+                      placeholder=""
                       rangeSelectorMode="absolute-only"
                       timeOffset={0}
                     />     

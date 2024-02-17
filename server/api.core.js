@@ -1,9 +1,10 @@
 
 
-const { classEMRCluster } = require('./class.core.js');
+const { classEMRCluster, classEMRGlobal } = require('./class.core.js');
 const { classAWS } = require('./class.aws.js');
 const { classApplicationUpdate } = require('./class.update.js');
 const AWSObject = new classAWS();
+const EMRGlobal = new classEMRGlobal();
 
 //-- Engine Objects
 var emrObjectContainer = [];
@@ -330,6 +331,36 @@ app.get("/api/aws/emr/cluster/gather/node/metrics", async (req, res) => {
                 };
 
                 var metrics = await emrObjectContainer[params.engineType + ":" + params.clusterId].getNodeMetrics(parameter);
+                res.status(200).send({ ... metrics });
+                
+        }
+        catch(err){
+                console.log(err);
+        }
+});
+
+
+
+//--++ EMR - EC2 : Gather global performance metrics
+app.get("/api/aws/emr/cluster/gather/global/metrics", async (req, res) => {
+
+        // Token Validation
+        var cognitoToken = verifyTokenCognito(req.headers['x-token-cognito']);
+    
+        if (cognitoToken.isValid === false)
+            return res.status(511).send({ data: [], message : "Token is invalid"});
+        
+        try
+            {
+                var params = req.query;
+                
+                const parameter = { 
+                  period : params.period,
+                  startDate : params.startDate,
+                  endDate : params.endDate,
+                };
+
+                var metrics = await EMRGlobal.getGlobalClusterMetrics(parameter);
                 res.status(200).send({ ... metrics });
                 
         }

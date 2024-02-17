@@ -17,6 +17,7 @@ import Authentication from "./pages/Authentication";
 import Home from "./pages/Home";
 import Logout from "./pages/Logout";
 import EmrEc201 from "./pages/Sm-emr-ec2-01";
+import SmDashboardEMR from "./pages/Sm-dasboardEMR";
 import SmclustersEMR from "./pages/Sm-clustersEMR";
 import SmAppUpdate from "./pages/Sm-appUpdate";
 
@@ -56,8 +57,9 @@ Axios.get(`/aws-exports.json`,).then((data)=>{
               <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<ProtectedApp><Home /> </ProtectedApp>} />
-                    <Route path="/sm-emr-ec2-01/" element={<ProtectedApp><EmrEc201 /> </ProtectedApp>} />
+                    <Route path="/dashboard/emr/" element={<ProtectedApp><SmDashboardEMR /> </ProtectedApp>} />
                     <Route path="/clusters/emr/" element={<ProtectedApp><SmclustersEMR /> </ProtectedApp>} />
+                    <Route path="/sm-emr-ec2-01/" element={<ProtectedApp><EmrEc201 /> </ProtectedApp>} />
                     <Route path="/authentication" element={<Authentication />} />
                     <Route path="/logout" element={<ProtectedApp><Logout /> </ProtectedApp>} />
                     <Route path="/updates" element={<ProtectedApp><SmAppUpdate /> </ProtectedApp>} />

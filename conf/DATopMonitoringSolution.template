@@ -201,7 +201,7 @@ Resources:
                   - Effect: "Allow"
                     Action:
                       - "sns:publish"
-                    Resource: "*"
+                    Resource: "arn:aws:sns:*:${AWS::AccountId}:*"
 
     EC2Instance:
         Type: "AWS::EC2::Instance"
@@ -261,15 +261,19 @@ Resources:
             SecurityGroupIngress: 
                 - 
                     CidrIp: !Ref SGInboundAccess
+                    Description: "Ingress Access - 443"
                     FromPort: 443
                     IpProtocol: "tcp"
                     ToPort: 443
                     
             SecurityGroupEgress: 
                 - 
-                    CidrIp: "0.0.0.0/0"
-                    IpProtocol: "-1"
-
+                    CidrIp: !Ref SGInboundAccess
+                    Description: "Egress Access - 443"
+                    FromPort: 443
+                    IpProtocol: "tcp"
+                    ToPort: 443
+               
 
     CognitoUserPool:
         Type: "AWS::Cognito::UserPool"

@@ -29,6 +29,327 @@ function replaceParameterValues(str, obj) {
 }
 
 
+
+//--#############
+//--############# CLASS : classEMRGlobal                                                                                                
+//--#############
+
+
+class classEMRGlobal {
+
+        //-- Looging
+        #objLog = new classLogging({ name : "classEMRGlobal", instance : "generic" });
+        
+        //-- Constructor method
+        constructor(object) { 
+            
+                
+                            
+        }
+
+
+        //-- Refresh Cluster Data 
+        async getGlobalClusterMetrics(object){
+            try {
+                 
+                var result = {
+                                totalClusters   : 0,
+                                totalCPUs       : 0,
+                                totalMemory     : 0,
+                                totalNodes      : 0,
+                                cpuUsage        : { avg : 0, p10 : 0, p50 : 0, p90 : 0 },
+                                memoryUsage     : { avg : 0, p10 : 0, p50 : 0, p90 : 0 },
+                                charts : {
+                                            clusters        : [],
+                                            cores           : [],
+                                            cpus            : [],
+                                            memory          : [],
+                                            jobsRunning     : [],
+                                            clusterLifeCycle : [],
+                                            cpuUsage        : { p10 : [], p50 : [], p90 : [] } ,
+                                            memoryUsage     : { p10 : [], p50 : [], p90 : [] } ,
+                                            coresUsage      : { p10 : [], p50 : [], p90 : [] } ,
+                                            roles           : { categories : [], series : [] },
+                                            instanceType    : { categories : [], series : [] },
+                                            instanceMarket  : { categories : [], series : [] }, 
+                                            globalInstanceType : [],
+                                            globalInstanceMarket : [],
+                                            globalInstanceRole : [],
+                                }
+                        
+                };
+                
+                //+++++++ SECTION 1 : Gather Nodes By Role 
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['clustersByRole'], parameters ) });
+                
+                
+                //-- Roles Grouping
+                var roleUnique = records.groupBy( node => node.role )
+                var rolesSeries = [];
+                var rolesCategories = [];
+                for (let item of Object.keys(roleUnique)) {
+                        
+                        var values = roleUnique[item].map(function (obj) {
+                          return obj.total;
+                        });
+                        
+                        rolesSeries.push({ name : item, data : values });
+                        
+                        if (rolesCategories.length == 0) {
+                            rolesCategories = roleUnique[item].map(function (obj) {
+                              return obj.time;
+                            });
+                        }
+                }
+                
+                //+++++++ SECTION 2 : Gather Nodes By Instance Type 
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['clustersByInstanceType'], parameters ) });
+                
+                
+                //-- Roles Grouping
+                var instanceTypeUnique = records.groupBy( node => node.instance_type )
+                var instanceTypeSeries = [];
+                var instanceTypeCategories = [];
+                for (let item of Object.keys(instanceTypeUnique)) {
+                        
+                        var values = instanceTypeUnique[item].map(function (obj) {
+                          return obj.total;
+                        });
+                        
+                        instanceTypeSeries.push({ name : item, data : values });
+                        
+                        if (instanceTypeCategories.length == 0) {
+                            instanceTypeCategories = instanceTypeUnique[item].map(function (obj) {
+                              return obj.time;
+                            });
+                        }
+                }
+                
+                
+                //+++++++ SECTION 3 : Gather Nodes By Market Type 
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['clustersByInstanceMarket'], parameters ) });
+                
+                
+                //-- Roles Grouping
+                var instanceMarketUnique = records.groupBy( node => node.market_type )
+                var instanceMarketSeries = [];
+                var instanceMarketCategories = [];
+                for (let item of Object.keys(instanceMarketUnique)) {
+                        
+                        var values = instanceMarketUnique[item].map(function (obj) {
+                          return obj.total;
+                        });
+                        
+                        instanceMarketSeries.push({ name : item, data : values });
+                        
+                        if (instanceMarketCategories.length == 0) {
+                            instanceMarketCategories = instanceMarketUnique[item].map(function (obj) {
+                              return obj.time;
+                            });
+                        }
+                }
+                
+                //+++++++ SECTION 4 : Total Clusters
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalClusters'], parameters ) });
+                
+                var totalClusters = records.map(function (obj) {
+                    return [obj.time, obj.total] ;
+                });
+                
+                
+                //+++++++ SECTION 5 : Total CPUs
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalCPUs'], parameters ) });
+                
+                var totalCPUs = records.map(function (obj) {
+                    return [obj.time, obj.total] ;
+                });
+                
+                
+                //+++++++ SECTION 6 : Total Memory
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalMemory'], parameters ) });
+                
+                var totalMemory = records.map(function (obj) {
+                    return [obj.time, obj.total] ;
+                });
+                
+                
+                //+++++++ SECTION 7 : Total Cores
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalCores'], parameters ) });
+                
+                var totalCores = records.map(function (obj) {
+                    return [obj.time, obj.total] ;
+                });
+                
+                
+                //+++++++ SECTION 7 : Total Jobs Running
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalJobsRunning'], parameters ) });
+                
+                var totalJobs = records.map(function (obj) {
+                    return [obj.time, obj.total] ;
+                });
+                
+                
+                //+++++++ SECTION 8 : CPU Usage
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['cpuUsage'], parameters ) });
+                
+                var cpuUsageP10 = records.map(function (obj) {
+                    return [obj.time, obj.cpu_p10] ;
+                });
+                
+                var cpuUsageP50 = records.map(function (obj) {
+                    return [obj.time, obj.cpu_p50] ;
+                });
+                
+                var cpuUsageP90 = records.map(function (obj) {
+                    return [obj.time, obj.cpu_p90] ;
+                });
+                
+                
+                
+                
+                //+++++++ SECTION 9 : Memory Usage
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['MemoryUsage'], parameters ) });
+                
+                var memoryUsageP10 = records.map(function (obj) {
+                    return [obj.time, obj.memory_p10] ;
+                });
+                
+                var memoryUsageP50 = records.map(function (obj) {
+                    return [obj.time, obj.memory_p50] ;
+                });
+                
+                var memoryUsageP90 = records.map(function (obj) {
+                    return [obj.time, obj.memory_p90] ;
+                });
+                
+                
+                //+++++++ SECTION 10 : Cores Usage
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['coreUsage'], parameters ) });
+                
+                var coresUsageP10 = records.map(function (obj) {
+                    return [obj.time, obj.cores_p10] ;
+                });
+                
+                var coresUsageP50 = records.map(function (obj) {
+                    return [obj.time, obj.cores_p50] ;
+                });
+                
+                var coresUsageP90 = records.map(function (obj) {
+                    return [obj.time, obj.cores_p90] ;
+                });
+                
+                
+                //+++++++ SECTION 11 : Cluster Life Cycle
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['clusterLifeCycle'], parameters ) });
+                
+                var clusterLifeCycle = records.map(function (obj) {
+                    return { x : obj.cluster_id, y : [new Date(obj.time_min).getTime() , new Date(obj.time_max).getTime() ] } ;
+                });
+                
+                
+                //+++++++ SECTION 12 : Cluster Summary
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryClusters'], parameters ) });
+                
+                var summaryClusters = {
+                        totalClusters   : records[0]?.['total_clusters'],
+                        totalCPUs       : records[0]?.['total_vcpu'],
+                        totalMemory     : records[0]?.['total_memory'],
+                        totalNodes      : records[0]?.['total_nodes'],
+                        cpuUsage        : { avg : records[0]?.['cpu_usage_avg'], p10 : records[0]?.['cpu_usage_p10'], p50 : records[0]?.['cpu_usage_p50'], p90 : records[0]?.['cpu_usage_p90'] },
+                        memoryUsage     : { avg : records[0]?.['memory_usage_avg'], p10 : records[0]?.['memory_usage_p10'], p50 : records[0]?.['memory_usage_p50'], p90 : records[0]?.['memory_usage_p90'] },
+                };
+                
+                
+                
+                //+++++++ SECTION 13 : Cluster Summary by Instance Type
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryByInstanceType'], parameters ) });
+                
+                var globalInstanceType = records.map(function (obj) {
+                          return { name : obj.instance_type, value : obj.total};
+                });
+                   
+                   
+                
+                //+++++++ SECTION 14 : Cluster Summary by Instance Market
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryByInstanceMarket'], parameters ) });
+                
+                var globalInstanceMarket = records.map(function (obj) {
+                          return { name : obj.market_type, value : obj.total};
+                });     
+                
+                
+                //+++++++ SECTION 15 : Cluster Summary by Instance Role
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryByInstanceRole'], parameters ) });
+                
+                var globalInstanceRole = records.map(function (obj) {
+                          return { name : obj.role, value : obj.total};
+                });
+                
+                result = { 
+                            ...summaryClusters,
+                            charts : {
+                                        clusters            : totalClusters, 
+                                        cpus                : totalCPUs,
+                                        cores               : totalCores,
+                                        memory              : totalMemory,
+                                        jobsRunning         : totalJobs,
+                                        clusterLifeCycle    : clusterLifeCycle,
+                                        cpuUsage            : { p10 : cpuUsageP10, p50 : cpuUsageP50, p90 : cpuUsageP90 } ,
+                                        memoryUsage         : { p10 : memoryUsageP10, p50 : memoryUsageP50, p90 : memoryUsageP90 } ,
+                                        coresUsage          : { p10 : coresUsageP10, p50 : coresUsageP50, p90 : coresUsageP90 } ,
+                                        roles               : { categories : rolesCategories, series : rolesSeries },
+                                        instanceType        : { categories : instanceTypeCategories, series : instanceTypeSeries },
+                                        instanceMarket      : { categories : instanceMarketCategories, series : instanceMarketSeries },
+                                        globalInstanceType  : globalInstanceType,
+                                        globalInstanceMarket  : globalInstanceMarket,
+                                        globalInstanceRole  : globalInstanceRole,
+                            },
+                };
+                
+            }
+            catch(error) {
+                    this.#objLog.write("refreshData","err",error);
+            }
+            
+            return result;
+            
+            
+        }
+        
+}
+
 //--#############
 //--############# CLASS : classEMRCluster                                                                                                
 //--#############
@@ -649,7 +970,7 @@ class classEMRCluster {
 }
 
 
-module.exports = { classEMRCluster };
+module.exports = { classEMRCluster, classEMRGlobal };
 
 
 
