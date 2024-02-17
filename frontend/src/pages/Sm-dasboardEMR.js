@@ -36,6 +36,7 @@ import ChartColumn01  from '../components/ChartColumn01';
 import DateTimePicker01 from "../components/DateTimePicker01";
 import ChartTimeLine01  from '../components/ChartTimeLine01';
 import ChartProgressBar01 from '../components/ChartProgressBar-01';
+import ChartRadialBar02 from '../components/ChartRadialBar02';
 
 
 import '@aws-amplify/ui-react/styles.css';
@@ -395,8 +396,19 @@ function Application() {
                                             
                                         </td>
                                         <td style={{ "width":"25%", "text-align" : "center"}}>
-                                            
-                                            <Box variant="h3">CPU Usage</Box>
+                                            <ChartRadialBar02 
+                                                    title={"CPU Usage(%)"} 
+                                                    height="300px" 
+                                                    width="100%" 
+                                                    labels = {JSON.stringify(['Average', 'P10', 'P50', 'P90'])}
+                                                    series = {JSON.stringify([
+                                                                                Math.round(globalStats['cpuUsage']?.['avg']),
+                                                                                Math.round(globalStats['cpuUsage']?.['p10']),
+                                                                                Math.round(globalStats['cpuUsage']?.['p50']),
+                                                                                Math.round(globalStats['cpuUsage']?.['p90']),
+                                                    ])}
+                                            />
+                                            {/*
                                             <table style={{"width":"100%", "padding": "1em"}}>
                                                 <tr>  
                                                     <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
@@ -447,60 +459,22 @@ function Application() {
                                                     </td>
                                                 </tr>
                                             </table>
+                                            */}
                                         </td>
                                         
                                         <td style={{ "width":"25%", "text-align" : "center"}}>
-                                            <Box variant="h3">Memory Usage</Box>
-                                            <table style={{"width":"100%", "padding": "1em"}}>
-                                                <tr>  
-                                                    <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
-                                                        <ChartProgressBar01 
-                                                            value={  Math.round(globalStats['memoryUsage']?.['avg']) || 0 }
-                                                            valueSufix={"%"}
-                                                            title={"avg"}
-                                                            precision={0}
-                                                            format={3}
-                                                            fontColorValue={configuration.colors.fonts.metric100}
-                                                            fontSizeValue={"16px"}
-                                                        />
-                                                    </td>
-                                                    <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
-                                                        <ChartProgressBar01 
-                                                            value={  Math.round(globalStats['memoryUsage']?.['p10']) || 0 }
-                                                            valueSufix={"%"}
-                                                            title={"p10"}
-                                                            precision={0}
-                                                            format={3}
-                                                            fontColorValue={configuration.colors.fonts.metric100}
-                                                            fontSizeValue={"16px"}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
-                                                        <ChartProgressBar01 
-                                                            value={  Math.round(globalStats['memoryUsage']?.['p50']) || 0 }
-                                                            valueSufix={"%"}
-                                                            title={"p50"}
-                                                            precision={0}
-                                                            format={3}
-                                                            fontColorValue={configuration.colors.fonts.metric100}
-                                                            fontSizeValue={"16px"}
-                                                        />
-                                                    </td>
-                                                    <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
-                                                        <ChartProgressBar01 
-                                                            value={  Math.round(globalStats['memoryUsage']?.['p90']) || 0 }
-                                                            valueSufix={"%"}
-                                                            title={"p90"}
-                                                            precision={0}
-                                                            format={3}
-                                                            fontColorValue={configuration.colors.fonts.metric100}
-                                                            fontSizeValue={"16px"}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            </table>
+                                            <ChartRadialBar02 
+                                                    title={"Memory Usage(%)"} 
+                                                    height="300px" 
+                                                    width="100%" 
+                                                    labels = {JSON.stringify(['Average', 'P10', 'P50', 'P90'])}
+                                                    series = {JSON.stringify([
+                                                                                Math.round(globalStats['memoryUsage']?.['avg']),
+                                                                                Math.round(globalStats['memoryUsage']?.['p10']),
+                                                                                Math.round(globalStats['memoryUsage']?.['p50']),
+                                                                                Math.round(globalStats['memoryUsage']?.['p90']),
+                                                    ])}
+                                            />
                                         </td>
                                     </tr>
                                 </table>
