@@ -370,6 +370,110 @@ module.exports = {
                                                         GROUP BY role
                                                         ORDER BY role desc
                                                         `,
+                                        "summaryClusterTable" : 
+                                                        `
+                                                        WITH vw_cpu_level_1 AS (
+                                                            SELECT 
+                                                                    cluster_id,
+                                                                    instance_id, 
+                                                                    instance_type, 
+                                                                    market_type, 
+                                                                    cast(total_vcpu as bigint) as cpu_total
+                                                            FROM emrdb.cpu
+                                                            WHERE time between {interval}
+                                                            GROUP BY 1,2,3,4,5
+                                                        ),
+                                                        vw_cpu_level_2 AS (
+                                                            SELECT 
+                                                                    cluster_id, 
+                                                                    COUNT(*) as nodes_total,
+                                                                    SUM(cpu_total) as cpu_total
+                                                            FROM vw_cpu_level_1
+                                                            GROUP BY cluster_id
+                                                        ),
+                                                        vw_cpu_level_3 AS (
+                                                            SELECT 
+                                                                    cluster_id,
+                                                                    AVG(100-usage_idle) as cpu_usage_avg,
+                                                                    APPROX_PERCENTILE(100-usage_idle,0.1) as cpu_usage_p10,
+                                                                    APPROX_PERCENTILE(100-usage_idle,0.5) as cpu_usage_p50,
+                                                                    APPROX_PERCENTILE(100-usage_idle,0.9) as cpu_usage_p90
+                                                            FROM emrdb.cpu
+                                                            WHERE time between {interval}
+                                                            GROUP BY cluster_id
+                                                        ),
+                                                        vw_cpu AS (
+                                                            SELECT 
+                                                                    a.cluster_id,
+                                                                    a.nodes_total,
+                                                                    a.cpu_total,
+                                                                    b.cpu_usage_avg,
+                                                                    b.cpu_usage_p10,
+                                                                    b.cpu_usage_p50,
+                                                                    b.cpu_usage_p90
+                                                            FROM vw_cpu_level_2 a, vw_cpu_level_3 b
+                                                            WHERE 
+                                                                a.cluster_id = b.cluster_id
+                                                        ),
+                                                        vw_memory_level_1 AS (
+                                                            SELECT 
+                                                                    cluster_id,
+                                                                    instance_id, 
+                                                                    instance_type, 
+                                                                    market_type, 
+                                                                    total as memory_total
+                                                            FROM emrdb.memory
+                                                            WHERE time between {interval}
+                                                            GROUP BY 1,2,3,4,5
+                                                        ),
+                                                        vw_memory_level_2 AS (
+                                                            SELECT 
+                                                                    cluster_id, 
+                                                                    SUM(memory_total) as memory_total
+                                                            FROM vw_memory_level_1
+                                                            GROUP BY cluster_id
+                                                        ),
+                                                        vw_memory_level_3 AS (
+                                                            SELECT 
+                                                                    cluster_id,
+                                                                    AVG(used_percent) as memory_usage_avg,
+                                                                    APPROX_PERCENTILE(used_percent,0.1) as memory_usage_p10,
+                                                                    APPROX_PERCENTILE(used_percent,0.5) as memory_usage_p50,
+                                                                    APPROX_PERCENTILE(used_percent,0.9) as memory_usage_p90
+                                                            FROM emrdb.memory
+                                                            WHERE time between {interval}
+                                                            GROUP BY cluster_id
+                                                        ),
+                                                        vw_memory AS (
+                                                            SELECT 
+                                                                    a.cluster_id,
+                                                                    a.memory_total,
+                                                                    b.memory_usage_avg,
+                                                                    b.memory_usage_p10,
+                                                                    b.memory_usage_p50,
+                                                                    b.memory_usage_p90
+                                                            FROM vw_memory_level_2 a, vw_memory_level_3 b
+                                                            WHERE 
+                                                                a.cluster_id = b.cluster_id
+                                                        )
+                                                        SELECT  
+                                                            a.cluster_id,
+                                                            a.nodes_total,
+                                                            a.cpu_total,
+                                                            a.cpu_usage_avg,
+                                                            a.cpu_usage_p10,
+                                                            a.cpu_usage_p50,
+                                                            a.cpu_usage_p90,
+                                                            b.memory_total,
+                                                            b.memory_usage_avg,
+                                                            b.memory_usage_p10,
+                                                            b.memory_usage_p50,
+                                                            b.memory_usage_p90
+                                                        FROM vw_cpu a, vw_memory b
+                                                        WHERE
+                                                            a.cluster_id = b.cluster_id
+                                                        ORDER BY a.cluster_id desc
+                                                        `,
                     
                     },
                     "cluster" : {

@@ -1,4 +1,5 @@
 import {useState,useEffect,useRef} from 'react'
+import ReactLoading from "react-loading";
 import Axios from 'axios'
 import { configuration, SideMainLayoutHeader,SideMainLayoutMenu } from './Configs';
 import { useSearchParams } from 'react-router-dom';
@@ -23,6 +24,7 @@ import Tabs from "@cloudscape-design/components/tabs";
 import Button from "@cloudscape-design/components/button";
 import Multiselect from "@cloudscape-design/components/multiselect";
 import ExpandableSection from "@cloudscape-design/components/expandable-section";
+import ColumnLayout from "@cloudscape-design/components/column-layout";
 
 
 import CompMetric01  from '../components/Metric01';
@@ -89,31 +91,22 @@ function Application() {
     const currentInstanceIdentifier = useRef("");
     
     //-- Table Nodes
-    const columnsTableNodes =  [
-                  {id: 'instance_id', header: 'InstanceId',cell: item => item['instance_id'],ariaLabel: createLabelFunction('instance_id'),sortingField: 'instance_id',},
+    const columnsTableClusters =  [
                   {id: 'cluster_id', header: 'ClusterId',cell: item => item['cluster_id'],ariaLabel: createLabelFunction('cluster_id'),sortingField: 'cluster_id',},
-                  {id: 'group_id', header: 'GroupId',cell: item => item['group_id'],ariaLabel: createLabelFunction('group_id'),sortingField: 'group_id',},
-                  {id: 'role', header: 'Role',cell: item => item['role'],ariaLabel: createLabelFunction('role'),sortingField: 'role',},
-                  {id: 'market_type', header: 'Mode',cell: item => item['market_type'],ariaLabel: createLabelFunction('market_type'),sortingField: 'market_type',},
-                  {id: 'az', header: 'AZ',cell: item => item['az'],ariaLabel: createLabelFunction('az'),sortingField: 'az',},
-                  {id: 'private_ip', header: 'PrivateIP',cell: item => item['private_ip'],ariaLabel: createLabelFunction('private_ip'),sortingField: 'private_ip',},
-                  {id: 'instance_type', header: 'InstanceType',cell: item => item['instance_type'],ariaLabel: createLabelFunction('instance_type'),sortingField: 'instance_type',},
-                  {id: 'total_vcpu',header: 'vCPUs',cell: item => customFormatNumberLong(parseFloat(item['total_vcpu']),0),ariaLabel: createLabelFunction('total_vcpu'),sortingField: 'total_vcpu', },
-                  {id: 'total_memory',header: 'Memory',cell: item => customFormatNumber(parseFloat(item['total_memory']),2),ariaLabel: createLabelFunction('total_memory'),sortingField: 'total_memory', },
-                  {id: 'cpu_usage',header: 'CPU(%)',cell: item => customFormatNumberLong(parseFloat(item['cpu_usage']),2),ariaLabel: createLabelFunction('cpu_usage'),sortingField: 'cpu_usage', },
-                  {id: 'memory_usage',header: 'Memory(%)',cell: item => customFormatNumberLong(parseFloat(item['memory_usage']),2),ariaLabel: createLabelFunction('memory_usage'),sortingField: 'memory_usage', },
-                  {id: 'total_disk_bytes',header: 'DiskBytes',cell: item => customFormatNumberLong(parseFloat(item['total_disk_bytes']),2),ariaLabel: createLabelFunction('total_disk_bytes'),sortingField: 'total_disk_bytes', },
-                  {id: 'read_bytes',header: 'IOReadBytes',cell: item => customFormatNumberLong(parseFloat(item['read_bytes']),2),ariaLabel: createLabelFunction('read_bytes'),sortingField: 'read_bytes', },
-                  {id: 'write_bytes',header: 'IOWriteBytes',cell: item => customFormatNumberLong(parseFloat(item['write_bytes']),2) ,ariaLabel: createLabelFunction('write_bytes'),sortingField: 'write_bytes', },
-                  {id: 'total_iops',header: 'IOPS',cell: item => customFormatNumberLong(parseFloat(item['total_iops']),2),ariaLabel: createLabelFunction('total_iops'),sortingField: 'total_iops', },
-                  {id: 'io_reads',header: 'IOPSReads',cell: item => customFormatNumberLong(parseFloat(item['io_reads']),2),ariaLabel: createLabelFunction('io_reads'),sortingField: 'io_reads', },
-                  {id: 'io_writes',header: 'IOPSWrites',cell: item => customFormatNumberLong(parseFloat(item['io_writes']),2) ,ariaLabel: createLabelFunction('io_writes'),sortingField: 'io_writes', },
-                  {id: 'total_network_bytes',header: 'NetworkBytes',cell: item => customFormatNumberLong(parseFloat(item['total_network_bytes']),2) ,ariaLabel: createLabelFunction('total_network_bytes'),sortingField: 'total_network_bytes', },
-                  {id: 'sent_bytes',header: 'NetBytesSent',cell: item => customFormatNumberLong(parseFloat(item['sent_bytes']),2) ,ariaLabel: createLabelFunction('sent_bytes'),sortingField: 'sent_bytes', },
-                  {id: 'recv_bytes',header: 'NetBytesRecv',cell: item => customFormatNumberLong(parseFloat(item['recv_bytes']),2),ariaLabel: createLabelFunction('recv_bytes'),sortingField: 'recv_bytes',},
+                  {id: 'nodes_total',header: 'Nodes',cell: item => customFormatNumberLong(parseFloat(item['nodes_total']),0),ariaLabel: createLabelFunction('nodes_total'),sortingField: 'nodes_total', },
+                  {id: 'cpu_total',header: 'CPUs',cell: item => customFormatNumberLong(parseFloat(item['cpu_total']),0),ariaLabel: createLabelFunction('cpu_total'),sortingField: 'cpu_total', },
+                  {id: 'memory_total',header: 'Memory',cell: item => customFormatNumber(parseFloat(item['memory_total']),2),ariaLabel: createLabelFunction('memory_total'),sortingField: 'memory_total', },
+                  {id: 'cpu_usage_avg',header: 'CPU Avg(%)',cell: item => customFormatNumberLong(parseFloat(item['cpu_usage_avg']),2),ariaLabel: createLabelFunction('cpu_usage_avg'),sortingField: 'cpu_usage_avg', },
+                  {id: 'cpu_usage_p10',header: 'CPU p10(%)',cell: item => customFormatNumberLong(parseFloat(item['cpu_usage_p10']),2),ariaLabel: createLabelFunction('cpu_usage_p10'),sortingField: 'cpu_usage_p10', },
+                  {id: 'cpu_usage_p50',header: 'CPU p50(%)',cell: item => customFormatNumberLong(parseFloat(item['cpu_usage_p50']),2),ariaLabel: createLabelFunction('cpu_usage_p50'),sortingField: 'cpu_usage_p50', },
+                  {id: 'cpu_usage_p90',header: 'CPU p90(%)',cell: item => customFormatNumberLong(parseFloat(item['cpu_usage_p90']),2),ariaLabel: createLabelFunction('cpu_usage_p90'),sortingField: 'cpu_usage_p90', },
+                  {id: 'memory_usage_avg',header: 'Memory Avg(%)',cell: item => customFormatNumberLong(parseFloat(item['memory_usage_avg']),2),ariaLabel: createLabelFunction('memory_usage_avg'),sortingField: 'memory_usage_avg', },
+                  {id: 'memory_usage_p10',header: 'Memory p10(%)',cell: item => customFormatNumberLong(parseFloat(item['memory_usage_p10']),2),ariaLabel: createLabelFunction('memory_usage_p10'),sortingField: 'memory_usage_p10', },
+                  {id: 'memory_usage_p50',header: 'Memory p50(%)',cell: item => customFormatNumberLong(parseFloat(item['memory_usage_p50']),2),ariaLabel: createLabelFunction('memory_usage_p50'),sortingField: 'memory_usage_p50', },
+                  {id: 'memory_usage_p90',header: 'Memory p90(%)',cell: item => customFormatNumberLong(parseFloat(item['memory_usage_p90']),2),ariaLabel: createLabelFunction('memory_usage_p90'),sortingField: 'memory_usage_p90', },
     ];
     
-    const visibleContentNodes = ['instance_id','cluster_id', 'group_id', 'role', 'instance_type', 'market_type', 'az', 'total_vcpu','total_memory', 'cpu_usage', 'memory_usage', 'total_disk_bytes', 'total_iops', 'total_network_bytes'];
+    const visibleContentClusters = ['cluster_id','nodes_total', 'cpu_total', 'cpu_usage_avg', 'cpu_usage_p10', 'cpu_usage_p50', 'cpu_usage_p90', 'memory_total', 'memory_usage_avg', 'memory_usage_p10', 'memory_usage_p50', 'memory_usage_p90' ];
     
     
     
@@ -125,6 +118,7 @@ function Application() {
                                                         totalNodes      : 0,
                                                         cpuUsage        : { avg : 0, p10 : 0, p50 : 0, p90 : 0 },
                                                         memoryUsage     : { avg : 0, p10 : 0, p50 : 0, p90 : 0 },
+                                                        clusters        : [],
                                                         charts : {
                                                             clusters        : [],
                                                             cores           : [],
@@ -162,9 +156,12 @@ function Application() {
                                                     { label: "Memory Usage(%)", value: "11"},
     ]);
     
+    const [requestInProgress,setRequestInProgress] = useState(false);
+    
     //-- Function Gather Cluster Stats
     async function gatherGlobalStats() {
         
+            setRequestInProgress(true);
             Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
             var api_url = configuration["apps-settings"]["api-url"];
             var startDate = (dateFilter.current['startDate'].substring(0,19)).replace("T", " ");
@@ -216,6 +213,7 @@ function Application() {
                   }).then((data)=>{
                       console.log(data);
                       setGlobalStats(data.data); 
+                      setRequestInProgress(false);
             })
             .catch((err) => {
                       console.log('Timeout API Call : /api/aws/emr/cluster/gather/global/metrics' );
@@ -289,6 +287,7 @@ function Application() {
                     
                 <div style={{"padding" : "1em" }}>
                     <div>
+                            
                             <Container
                                 
                                 header={
@@ -299,7 +298,15 @@ function Application() {
                                               direction="horizontal"
                                               size="xs"
                                             >
-                                                
+                                                { requestInProgress === true  &&
+                                                    <ReactLoading
+                                                          type={"bars"}
+                                                          color={"#03fc4e"}
+                                                          height={"35px"}
+                                                          width={"35px"}
+        
+                                                    />
+                                                }
                                                 <DateTimePicker01
                                                       value={dateFilter.current}
                                                       onChangeDateSelection={(detail) => {
@@ -321,19 +328,19 @@ function Application() {
                                         </Header>
                                       }
                             >
-                                <table style={{"width":"100%", "padding": "1em"}}>
-                                    <tr>  
-                                        <td style={{ "width":"25%", "text-align" : "center"}}>
-                                            <CompMetric01 
+                                <br/>
+                                <ColumnLayout columns={4} variant="text-grid">
+                                      <div>
+                                        <CompMetric01 
                                                 value={globalStats['totalClusters']|| 0}
                                                 title={"TotalClusters"}
                                                 precision={0}
                                                 format={3}
                                                 fontColorValue={configuration.colors.fonts.metric100}
                                                 fontSizeValue={"32px"}
-                                            />
-                                        </td>
-                                        <td style={{ "width":"25%", "text-align" : "center"}}>
+                                        />
+                                      </div>
+                                      <div>
                                             <CompMetric01 
                                                 value={globalStats['totalNodes']|| 0}
                                                 title={"TotalNodes"}
@@ -342,8 +349,8 @@ function Application() {
                                                 fontColorValue={configuration.colors.fonts.metric100}
                                                 fontSizeValue={"32px"}
                                             />
-                                        </td>
-                                        <td style={{ "width":"25%", "text-align" : "center"}}>
+                                      </div>
+                                      <div>
                                             <CompMetric01 
                                                 value={globalStats['totalCPUs']|| 0}
                                                 title={"TotalVCPUs"}
@@ -352,8 +359,8 @@ function Application() {
                                                 fontColorValue={configuration.colors.fonts.metric100}
                                                 fontSizeValue={"32px"}
                                             />
-                                        </td>
-                                        <td style={{ "width":"25%", "text-align" : "center"}}>
+                                      </div>
+                                      <div>
                                             <CompMetric01 
                                                 value={globalStats['totalMemory']|| 0}
                                                 title={"TotalMemory(GB)"}
@@ -362,122 +369,9 @@ function Application() {
                                                 fontColorValue={configuration.colors.fonts.metric100}
                                                 fontSizeValue={"32px"}
                                             />
-                                        </td>
-                                    </tr>
-                                </table>
+                                      </div>
+                                </ColumnLayout>
                                 <br/>
-                                <table style={{"width":"100%", "padding": "1em"}}>
-                                    <tr>
-                                        <td valign="top" style={{ "width":"15%", "text-align" : "center"}}>
-                                            <ChartPie01 
-                                                    title={"Instances by Type"} 
-                                                    height="300px" 
-                                                    width="100%" 
-                                                    dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceType']) }
-                                            />
-                                            
-                                        </td>
-                                        <td valign="top" style={{ "width":"15%", "text-align" : "center"}}>
-                                            <ChartPie01 
-                                                    title={"Instances by Market"} 
-                                                    height="300px" 
-                                                    width="100%" 
-                                                    dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceMarket']) }
-                                            />
-                                            
-                                        </td>
-                                        <td valign="top" style={{ "width":"15%", "text-align" : "center"}}>
-                                            <ChartPie01 
-                                                    title={"Instances by Role"} 
-                                                    height="300px" 
-                                                    width="100%" 
-                                                    dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceRole']) }
-                                            />
-                                            
-                                        </td>
-                                        <td style={{ "width":"25%", "text-align" : "center"}}>
-                                            <ChartRadialBar02 
-                                                    title={"CPU Usage(%)"} 
-                                                    height="300px" 
-                                                    width="100%" 
-                                                    labels = {JSON.stringify(['Average','P10', 'P50','P90'])}
-                                                    series = {JSON.stringify([
-                                                                                Math.round(globalStats['cpuUsage']?.['avg']),
-                                                                                Math.round(globalStats['cpuUsage']?.['p10']),
-                                                                                Math.round(globalStats['cpuUsage']?.['p50']),
-                                                                                Math.round(globalStats['cpuUsage']?.['p90']),
-                                                    ])}
-                                            />
-                                            {/*
-                                            <table style={{"width":"100%", "padding": "1em"}}>
-                                                <tr>  
-                                                    <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
-                                                        <ChartProgressBar01 
-                                                            value={  Math.round(globalStats['cpuUsage']?.['avg']) || 0 }
-                                                            valueSufix={"%"}
-                                                            title={"avg"}
-                                                            precision={0}
-                                                            format={3}
-                                                            fontColorValue={configuration.colors.fonts.metric100}
-                                                            fontSizeValue={"16px"}
-                                                        />
-                                                    </td>
-                                                    <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
-                                                        <ChartProgressBar01 
-                                                            value={  Math.round(globalStats['cpuUsage']?.['p10']) || 0 }
-                                                            valueSufix={"%"}
-                                                            title={"p10"}
-                                                            precision={0}
-                                                            format={3}
-                                                            fontColorValue={configuration.colors.fonts.metric100}
-                                                            fontSizeValue={"16px"}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
-                                                        <ChartProgressBar01 
-                                                            value={  Math.round(globalStats['cpuUsage']?.['p50']) || 0 }
-                                                            valueSufix={"%"}
-                                                            title={"p50"}
-                                                            precision={0}
-                                                            format={3}
-                                                            fontColorValue={configuration.colors.fonts.metric100}
-                                                            fontSizeValue={"16px"}
-                                                        />
-                                                    </td>
-                                                    <td style={{ "width":"25%", "text-align" : "center", "padding": "1em"}}>
-                                                        <ChartProgressBar01 
-                                                            value={  Math.round(globalStats['cpuUsage']?.['p90']) || 0 }
-                                                            valueSufix={"%"}
-                                                            title={"p90"}
-                                                            precision={0}
-                                                            format={3}
-                                                            fontColorValue={configuration.colors.fonts.metric100}
-                                                            fontSizeValue={"16px"}
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                            */}
-                                        </td>
-                                        
-                                        <td style={{ "width":"25%", "text-align" : "center"}}>
-                                            <ChartRadialBar02 
-                                                    title={"Memory Usage(%)"} 
-                                                    height="300px" 
-                                                    width="100%" 
-                                                    labels = {JSON.stringify(['Average', 'P10', 'P50', 'P90'])}
-                                                    series = {JSON.stringify([
-                                                                                Math.round(globalStats['memoryUsage']?.['avg']),
-                                                                                Math.round(globalStats['memoryUsage']?.['p10']),
-                                                                                Math.round(globalStats['memoryUsage']?.['p50']),
-                                                                                Math.round(globalStats['memoryUsage']?.['p90']),
-                                                    ])}
-                                            />
-                                        </td>
-                                    </tr>
-                                </table>
                                 <ExpandableSection headerText="Widget Selection">
                                     <table style={{"width":"100%", "padding": "1em"}}>
                                         <tr>  
@@ -508,7 +402,129 @@ function Application() {
                                         </tr>
                                     </table>   
                                 </ExpandableSection>
-                                             
+                            </Container>
+                            <br/>
+                            
+                            <Container
+                                    header={
+                                        <Header
+                                          variant="h2"
+                                        >
+                                          Instance Distribution
+                                        </Header>
+                                        }
+                            >
+                                <br/>
+                                <ColumnLayout columns={3} variant="text-grid">
+                                    <div>
+                                        <ChartPie01 
+                                                title={"Instances by Type"} 
+                                                height="300px" 
+                                                width="100%" 
+                                                dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceType']) }
+                                        />
+                                    </div>
+                                    <div>
+                                        <ChartPie01 
+                                                title={"Instances by Market"} 
+                                                height="300px" 
+                                                width="100%" 
+                                                dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceMarket']) }
+                                        />
+                                    </div>
+                                    <div>
+                                      <ChartPie01 
+                                                title={"Instances by Role"} 
+                                                height="300px" 
+                                                width="100%" 
+                                                dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceRole']) }
+                                        />
+                                    </div>
+                                </ColumnLayout>
+                            </Container>
+                            <br/>
+                            
+                            <ColumnLayout columns={2}>
+                                <Container
+                                        header={
+                                            <Header
+                                              variant="h2"
+                                            >
+                                              CPU Usage(%)
+                                            </Header>
+                                            }
+                                >
+                                    <br/>
+                                    <ChartRadialBar02 
+                                                title={""} 
+                                                height="300px" 
+                                                width="100%" 
+                                                labels = {JSON.stringify(['Average','P10', 'P50','P90'])}
+                                                series = {JSON.stringify([
+                                                                            Math.round(globalStats['cpuUsage']?.['avg']),
+                                                                            Math.round(globalStats['cpuUsage']?.['p10']),
+                                                                            Math.round(globalStats['cpuUsage']?.['p50']),
+                                                                            Math.round(globalStats['cpuUsage']?.['p90']),
+                                                ])}
+                                    />
+                                </Container>
+                                
+                                <Container
+                                        header={
+                                            <Header
+                                              variant="h2"
+                                            >
+                                              Memory Usage(%)
+                                            </Header>
+                                            }
+                                >
+                                    <br/>
+                                    <ChartRadialBar02 
+                                                title={""} 
+                                                height="300px" 
+                                                width="100%" 
+                                                labels = {JSON.stringify(['Average', 'P10', 'P50', 'P90'])}
+                                                series = {JSON.stringify([
+                                                                            Math.round(globalStats['memoryUsage']?.['avg']),
+                                                                            Math.round(globalStats['memoryUsage']?.['p10']),
+                                                                            Math.round(globalStats['memoryUsage']?.['p50']),
+                                                                            Math.round(globalStats['memoryUsage']?.['p90']),
+                                                ])}
+                                    />
+                                </Container>
+                            </ColumnLayout>
+                            <br/>
+                         
+                            <Container
+                                    header={
+                                        <Header
+                                          variant="h2"
+                                        >
+                                          Cluster Details
+                                        </Header>
+                                        }
+                            >
+                                <br/>
+                                <CustomTable02
+                                        columnsTable={columnsTableClusters}
+                                        visibleContent={visibleContentClusters}
+                                        dataset={globalStats['clusters']}
+                                        title={"Clusters"}
+                                        description={""}
+                                        pageSize={20}
+                                        onSelectionItem={( item ) => {
+                                                                  /*
+                                                                    currentInstanceIdentifier.current = item[0]?.["instance_id"];
+                                                                    splitPanelState.current = true;
+                                                                    setsplitPanelShow(true);
+                                                                    gatherNodeStats();
+                                                                */
+                                          }
+                                        }
+                                        extendedTableProperties = {
+                                            { variant : "borderless" }
+                                        }
+                                />
                             </Container>
                             <br/>
                             { chartSelected("Cluster LifeCycle",selectedOptions) === true  &&
@@ -521,22 +537,16 @@ function Application() {
                                                         </Header>
                                                         }
                                     >  
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartTimeLine01 
-                                                            series={JSON.stringify(globalStats['charts']?.['clusterLifeCycle'])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            onClickData={(element) => {
-                                                                                console.log(element);
-                                                                            }
-                                                            }
-                                                            toolbar={true}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <ChartTimeLine01 
+                                                series={JSON.stringify(globalStats['charts']?.['clusterLifeCycle'])} 
+                                                title={""} 
+                                                height="300px" 
+                                                onClickData={(element) => {
+                                                                    console.log(element);
+                                                                }
+                                                }
+                                                toolbar={true}
+                                        />
                                     </Container>  
                                     <br/>
                                 </div>
@@ -552,19 +562,13 @@ function Application() {
                                                         </Header>
                                                         }
                                     >  
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartColumn01 
-                                                            series={JSON.stringify(globalStats['charts']?.['roles']?.['series'])}
-                                                            categories={JSON.stringify(globalStats['charts']?.['roles']?.['categories'])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <ChartColumn01 
+                                                series={JSON.stringify(globalStats['charts']?.['roles']?.['series'])}
+                                                categories={JSON.stringify(globalStats['charts']?.['roles']?.['categories'])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                        />
                                     </Container>  
                                     <br/>
                                 </div>
@@ -580,18 +584,12 @@ function Application() {
                                                         </Header>
                                                         }
                                     >  
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartColumn01 
-                                                            series={JSON.stringify(globalStats['charts']?.['instanceType']?.['series'])}
-                                                            categories={JSON.stringify(globalStats['charts']?.['instanceType']?.['categories'])} 
-                                                            title={"Instances by Class"} height="300px" 
-                                                            toolbar={true}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <ChartColumn01 
+                                                series={JSON.stringify(globalStats['charts']?.['instanceType']?.['series'])}
+                                                categories={JSON.stringify(globalStats['charts']?.['instanceType']?.['categories'])} 
+                                                title={"Instances by Class"} height="300px" 
+                                                toolbar={true}
+                                        />
                                     </Container>  
                                     <br/>
                                 </div>
@@ -608,19 +606,13 @@ function Application() {
                                                         </Header>
                                                         }
                                     >  
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartColumn01 
-                                                            series={JSON.stringify(globalStats['charts']?.['instanceMarket']?.['series'])}
-                                                            categories={JSON.stringify(globalStats['charts']?.['instanceMarket']?.['categories'])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <ChartColumn01 
+                                                series={JSON.stringify(globalStats['charts']?.['instanceMarket']?.['series'])}
+                                                categories={JSON.stringify(globalStats['charts']?.['instanceMarket']?.['categories'])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                        />
                                     </Container>  
                                     <br/>
                                     </div>
@@ -636,19 +628,13 @@ function Application() {
                                                         </Header>
                                                         }
                                     >  
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartDots01 series={JSON.stringify([
-                                                               { name : "clusters", data : globalStats['charts']?.['clusters'] }
-                                                            ])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <ChartDots01 series={JSON.stringify([
+                                                   { name : "clusters", data : globalStats['charts']?.['clusters'] }
+                                                ])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                        />
                                     </Container>  
                                     <br/>
                                 </div>
@@ -664,22 +650,16 @@ function Application() {
                                                         </Header>
                                                         }
                                     >  
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartDots01 series={JSON.stringify([
-                                                               { name : "p10", data : globalStats['charts']?.['cpuUsage']?.['p10'] },
-                                                               { name : "p50", data : globalStats['charts']?.['cpuUsage']?.['p50'] },
-                                                               { name : "p90", data : globalStats['charts']?.['cpuUsage']?.['p90'] },
-                                                            ])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                            ymax={100}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <ChartDots01 series={JSON.stringify([
+                                                   { name : "p10", data : globalStats['charts']?.['cpuUsage']?.['p10'] },
+                                                   { name : "p50", data : globalStats['charts']?.['cpuUsage']?.['p50'] },
+                                                   { name : "p90", data : globalStats['charts']?.['cpuUsage']?.['p90'] },
+                                                ])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                                ymax={100}
+                                        />
                                     </Container>  
                                     <br/>
                                 </div>
@@ -697,19 +677,13 @@ function Application() {
                                                         </Header>
                                                         }
                                     >  
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartDots01 series={JSON.stringify([
-                                                               { name : "cores", data : globalStats['charts']?.['cores'] }
-                                                            ])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
+                                        <ChartDots01 series={JSON.stringify([
+                                                   { name : "cores", data : globalStats['charts']?.['cores'] }
+                                                ])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                        />
                                         </Container>  
                                     <br/>
                                 </div>
@@ -726,23 +700,17 @@ function Application() {
                                                         </Header>
                                                         }
                                     >  
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartDots01 series={JSON.stringify([
-                                                               { name : "p10", data : globalStats['charts']?.['coresUsage']?.['p10'] },
-                                                               { name : "p50", data : globalStats['charts']?.['coresUsage']?.['p50'] },
-                                                               { name : "p90", data : globalStats['charts']?.['coresUsage']?.['p90'] },
-                                                            ])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                            ymax={100}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        </Container>  
+                                        <ChartDots01 series={JSON.stringify([
+                                                   { name : "p10", data : globalStats['charts']?.['coresUsage']?.['p10'] },
+                                                   { name : "p50", data : globalStats['charts']?.['coresUsage']?.['p50'] },
+                                                   { name : "p90", data : globalStats['charts']?.['coresUsage']?.['p90'] },
+                                                ])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                                ymax={100}
+                                        />
+                                    </Container>  
                                     <br/>
                                 </div>
                                 }
@@ -758,20 +726,14 @@ function Application() {
                                                         </Header>
                                                         }
                                     >
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartDots01 series={JSON.stringify([
-                                                               { name : "jobs", data : globalStats['charts']?.['jobsRunning'] }
-                                                            ])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        </Container>  
+                                        <ChartDots01 series={JSON.stringify([
+                                                   { name : "jobs", data : globalStats['charts']?.['jobsRunning'] }
+                                                ])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                        />
+                                    </Container>  
                                     <br/>
                                 </div>
                                 }
@@ -787,20 +749,14 @@ function Application() {
                                                         </Header>
                                                         }
                                     >
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartDots01 series={JSON.stringify([
-                                                               { name : "memory", data : globalStats['charts']?.['memory'] }
-                                                            ])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        </Container>  
+                                        <ChartDots01 series={JSON.stringify([
+                                                   { name : "memory", data : globalStats['charts']?.['memory'] }
+                                                ])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                        />
+                                    </Container>  
                                     <br/>
                                 </div>
                                 }
@@ -815,51 +771,21 @@ function Application() {
                                                         </Header>
                                                         }
                                     >
-                                        <table style={{"width":"100%", "padding": "1em"}}>
-                                            <tr>  
-                                                <td style={{ "width":"100%", "text-align" : "center"}}>
-                                                    <ChartDots01 series={JSON.stringify([
-                                                               { name : "p10", data : globalStats['charts']?.['memoryUsage']?.['p10'] },
-                                                               { name : "p50", data : globalStats['charts']?.['memoryUsage']?.['p50'] },
-                                                               { name : "p90", data : globalStats['charts']?.['memoryUsage']?.['p90'] },
-                                                            ])} 
-                                                            title={""} 
-                                                            height="300px" 
-                                                            toolbar={true}
-                                                            ymax={100}
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        </Container>  
+                                        <ChartDots01 series={JSON.stringify([
+                                                   { name : "p10", data : globalStats['charts']?.['memoryUsage']?.['p10'] },
+                                                   { name : "p50", data : globalStats['charts']?.['memoryUsage']?.['p50'] },
+                                                   { name : "p90", data : globalStats['charts']?.['memoryUsage']?.['p90'] },
+                                                ])} 
+                                                title={""} 
+                                                height="300px" 
+                                                toolbar={true}
+                                                ymax={100}
+                                        />
+                                    </Container>  
                                     <br/>
                                 </div>
                                 }
                             
-                            
-                            {/*                
-                            <Container>
-                                <CustomTable02
-                                        columnsTable={columnsTableNodes}
-                                        visibleContent={visibleContentNodes}
-                                        dataset={clusterStats['host']?.['nodes']}
-                                        title={"Nodes"}
-                                        description={""}
-                                        pageSize={20}
-                                        onSelectionItem={( item ) => {
-                                                                    currentInstanceIdentifier.current = item[0]?.["instance_id"];
-                                                                    splitPanelState.current = true;
-                                                                    setsplitPanelShow(true);
-                                                                    gatherNodeStats();
-                                          }
-                                        }
-                                        extendedTableProperties = {
-                                            { variant : "borderless" }
-                                            
-                                        }
-                                />
-                            </Container>
-                            */}
                     </div>
                 </div>
                 

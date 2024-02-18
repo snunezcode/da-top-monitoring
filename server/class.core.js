@@ -59,6 +59,7 @@ class classEMRGlobal {
                                 totalNodes      : 0,
                                 cpuUsage        : { avg : 0, max : 0, min : 0, p10 : 0, p50 : 0, p90 : 0 },
                                 memoryUsage     : { avg : 0, max : 0, min : 0, p10 : 0, p50 : 0, p90 : 0 },
+                                clusters        : [],
                                 charts : {
                                             clusters        : [],
                                             cores           : [],
@@ -317,8 +318,17 @@ class classEMRGlobal {
                           return { name : obj.role, value : obj.total};
                 });
                 
+                
+                
+                //+++++++ SECTION 15 : Cluster Summary by Instance Role
+                 
+                var parameters = { period : object.period, interval : object.startDate + ' and ' + object.endDate };
+                var clusters = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryClusterTable'], parameters ) });
+                
+                
                 result = { 
                             ...summaryClusters,
+                            clusters : clusters,
                             charts : {
                                         clusters            : totalClusters, 
                                         cpus                : totalCPUs,
