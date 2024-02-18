@@ -400,7 +400,7 @@ function Application() {
                                                     title={"CPU Usage(%)"} 
                                                     height="300px" 
                                                     width="100%" 
-                                                    labels = {JSON.stringify(['Average', 'P10', 'P50', 'P90'])}
+                                                    labels = {JSON.stringify(['Average','P10', 'P50','P90'])}
                                                     series = {JSON.stringify([
                                                                                 Math.round(globalStats['cpuUsage']?.['avg']),
                                                                                 Math.round(globalStats['cpuUsage']?.['p10']),

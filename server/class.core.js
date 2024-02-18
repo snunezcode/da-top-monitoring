@@ -57,8 +57,8 @@ class classEMRGlobal {
                                 totalCPUs       : 0,
                                 totalMemory     : 0,
                                 totalNodes      : 0,
-                                cpuUsage        : { avg : 0, p10 : 0, p50 : 0, p90 : 0 },
-                                memoryUsage     : { avg : 0, p10 : 0, p50 : 0, p90 : 0 },
+                                cpuUsage        : { avg : 0, max : 0, min : 0, p10 : 0, p50 : 0, p90 : 0 },
+                                memoryUsage     : { avg : 0, max : 0, min : 0, p10 : 0, p50 : 0, p90 : 0 },
                                 charts : {
                                             clusters        : [],
                                             cores           : [],
@@ -281,7 +281,7 @@ class classEMRGlobal {
                         totalCPUs       : records[0]?.['total_vcpu'],
                         totalMemory     : records[0]?.['total_memory'],
                         totalNodes      : records[0]?.['total_nodes'],
-                        cpuUsage        : { avg : records[0]?.['cpu_usage_avg'], p10 : records[0]?.['cpu_usage_p10'], p50 : records[0]?.['cpu_usage_p50'], p90 : records[0]?.['cpu_usage_p90'] },
+                        cpuUsage        : { avg : records[0]?.['cpu_usage_avg'],max : records[0]?.['cpu_usage_max'],min : records[0]?.['cpu_usage_min'], p10 : records[0]?.['cpu_usage_p10'], p50 : records[0]?.['cpu_usage_p50'], p90 : records[0]?.['cpu_usage_p90'] },
                         memoryUsage     : { avg : records[0]?.['memory_usage_avg'], p10 : records[0]?.['memory_usage_p10'], p50 : records[0]?.['memory_usage_p50'], p90 : records[0]?.['memory_usage_p90'] },
                 };
                 

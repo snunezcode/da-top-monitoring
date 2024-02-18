@@ -276,6 +276,8 @@ module.exports = {
                                                             SELECT 
                                                             'cursor' as label,
                                                             AVG(100-usage_idle) as cpu_usage_avg,
+                                                            MAX(100-usage_idle) as cpu_usage_max,
+                                                            MIN(100-usage_idle) as cpu_usage_min,
                                                             APPROX_PERCENTILE(100-usage_idle,0.1) as cpu_usage_p10,
                                                             APPROX_PERCENTILE(100-usage_idle,0.5) as cpu_usage_p50,
                                                             APPROX_PERCENTILE(100-usage_idle,0.9) as cpu_usage_p90
@@ -302,6 +304,8 @@ module.exports = {
                                                             c.total as total_memory,
                                                             d.total as total_nodes,
                                                             e.cpu_usage_avg,
+                                                            e.cpu_usage_max,
+                                                            e.cpu_usage_min,
                                                             e.cpu_usage_p10,
                                                             e.cpu_usage_p50,
                                                             e.cpu_usage_p90,
