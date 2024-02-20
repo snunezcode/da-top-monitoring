@@ -1,12 +1,11 @@
 import {useState,useEffect,useRef} from 'react'
 import Axios from 'axios'
-import { configuration, SideMainLayoutHeader,SideMainLayoutMenu } from './Configs';
+import { configuration } from './Configs';
 import { useSearchParams } from 'react-router-dom';
 
+import { applicationVersionUpdate } from '../components/Functions';
 import { createLabelFunction, customFormatNumberLong, customFormatNumber, customFormatDateDifference } from '../components/Functions';
 
-import ContentLayout from '@cloudscape-design/components/content-layout';
-import SideNavigation from '@cloudscape-design/components/side-navigation';
 import Header from "@cloudscape-design/components/header";
 import StatusIndicator from "@cloudscape-design/components/status-indicator";
 import Spinner from "@cloudscape-design/components/spinner";
@@ -18,7 +17,6 @@ import Box from "@cloudscape-design/components/box";
 import Container from "@cloudscape-design/components/container";
 import CustomHeader from "../components/Header";
 import Tabs from "@cloudscape-design/components/tabs";
-import BreadcrumbGroup from "@cloudscape-design/components/breadcrumb-group";
 
 import CompMetric01  from '../components/Metric01';
 import ChartLine04  from '../components/ChartLine04';
@@ -47,7 +45,9 @@ var CryptoJS = require("crypto-js");
 
 function Application() {
 
-    
+    //-- Application Version
+    const [versionMessage, setVersionMessage] = useState([]);
+
     //-- Add Header Cognito Token
     Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
     Axios.defaults.headers.common['x-token-cognito'] = sessionStorage.getItem("x-token-cognito");
@@ -369,7 +369,29 @@ function Application() {
         
     }
     
+    //-- Function Gather App Version
+   async function gatherVersion (){
 
+        //-- Application Update
+        var appVersionObject = await applicationVersionUpdate({ codeId : "dbwcmp", moduleId: "elastic-m1"} );
+        
+        if (appVersionObject.release > configuration["apps-settings"]["release"] ){
+          setVersionMessage([
+                              {
+                                type: "info",
+                                content: "New Application version is available, new features and modules will improve workload capabilities and user experience.",
+                                dismissible: true,
+                                dismissLabel: "Dismiss message",
+                                onDismiss: () => setVersionMessage([]),
+                                id: "message_1"
+                              }
+          ]);
+      
+        }
+        
+   }
+   
+   
    useEffect(() => {
         const id = setInterval(gatherClusterInformation, configuration["apps-settings"]["refresh-interval-emr-cluster"]);
         return () => clearInterval(id);
@@ -384,7 +406,7 @@ function Application() {
       <AppLayout
             disableContentPaddings
             toolsHide
-            navigation={<SideNavigation activeHref={""} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
+            navigationHide
             contentType="default"
             splitPanelOpen={splitPanelShow}
             splitPanelOpen={splitPanelShow}
@@ -542,24 +564,16 @@ function Application() {
                     
             }
             content={
-                <ContentLayout disableOverlap>
+                <div style={{"padding" : "1em"}}>
                     
-                    <table style={{"width":"100%", "padding-left" : "1em", "padding-right" : "1em" }}>
+                    <table style={{"width":"100%"}}>
                         <tr>  
                             <td style={{"width":"50%","padding-left": "1em", "border-left": "10px solid " + configuration.colors.lines.separator100,}}>  
-                                <BreadcrumbGroup
-                                      items={[
-                                        { text: "EMR", href: "#" },
-                                        { text: "Clusters", href: "/emr/clusters" },
-                                        { text: "Live Monitoring"}
-                                      ]}
-                                      ariaLabel="Breadcrumbs"
-                                />
                                 <SpaceBetween direction="horizontal" size="xs">
                                     { ( clusterStats['status'] != 'RUNNING' && clusterStats['status'] != 'WAITING' )  &&
                                         <Spinner size="big" />
                                     }
-                                    <Box variant="h2" color="text-status-inactive" >{parameter_object_values["name"]} ({parameter_object_values["clusterId"] })</Box>
+                                    <Box variant="h3" color="text-status-inactive" >{parameter_object_values["name"]} ({parameter_object_values["clusterId"] })</Box>
                                 </SpaceBetween>
                             </td>
                             <td style={{"width":"10%","padding-left": "1em", "border-left": "4px solid " + configuration.colors.lines.separator100,}}>  
@@ -590,7 +604,7 @@ function Application() {
                     </table>
                     
                     <div style={{"padding" : "1em"}}>
-                            <Container header={<Header variant="h2">Cluster Summary</Header>} >
+                            <Container header={<Header variant="h2">EMR Dashboard</Header>} >
                                 <table style={{"width":"100%", "padding": "1em"}}>
                                     <tr>
                                         <td style={{ "width":"10%", "text-align" : "center"}}>
@@ -1138,9 +1152,10 @@ function Application() {
                                 
                     </div>
                 
-                </ContentLayout>
+                </div>
                 
             }
+            disableContentHeaderOverlap={true}
             headerSelector="#h" 
         />
     </div>

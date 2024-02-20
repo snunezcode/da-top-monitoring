@@ -34,8 +34,8 @@ export const SideMainLayoutMenu = [
       type: 'section',
       defaultExpanded: true,
       items: [
-          { type: "link", text: "Dashboard", href: "/dashboard/emr" },
-          { type: "link", text: "Clusters", href: "/clusters/emr" },
+          { type: "link", text: "Clusters", href: "/emr/clusters" },
+          { type: "link", text: "Dashboard", href: "/emr/dashboard" },
       ],
     },
     { type: "divider" },
@@ -43,7 +43,7 @@ export const SideMainLayoutMenu = [
     {
           type: "link",
           text: "Documentation",
-          href: "https://github.com/snunezcode/da-monitoring-solution/",
+          href: "https://github.com/aws-samples/da-monitoring-solution/",
           external: true,
           externalIconAriaLabel: "Opens in a new tab"
     },

@@ -15,7 +15,6 @@
     "@aws-sdk/client-cloudwatch-logs": "^3.504.0",
     "@aws-sdk/client-emr": "^3.504.0",
     "@aws-sdk/client-timestream-query": "^3.490.0",
-    "aws-sdk": "^2.1539.0",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "core-js": "^3.35.1",

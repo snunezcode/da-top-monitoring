@@ -1,12 +1,403 @@
 module.exports = {
         "queries": {
+                    "history" : {
+                                    "Q-A01-clustersByRole" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id,instance_id,role
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id,instance_id,role
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            role, 
+                                                            count(*) as total
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time,role
+                                                        ORDER BY 
+                                                            time desc
+                                                        `, 
+                                    "Q-A02-clustersByInstanceType" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id,instance_id,instance_type
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id,instance_id,instance_type
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            instance_type, 
+                                                            count(*) as total
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time,instance_type
+                                                        ORDER BY 
+                                                            time desc
+                                                        `,
+                                    "Q-A03-clustersByInstanceMarket" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id,instance_id,market_type
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id,instance_id,market_type
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            market_type, 
+                                                            count(*) as total
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time,market_type
+                                                        ORDER BY 
+                                                            time desc
+                                                        `,
+                                    "Q-A04-totalCPUs" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id, instance_id, total_vcpu
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id, instance_id, total_vcpu
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            sum(cast (total_vcpu as bigint)) as total
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time
+                                                        ORDER BY 
+                                                            time desc
+                                                        `,
+                                    "Q-A05-totalMemory" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id, instance_id, round(total/1024/1024/1024) as total
+                                                            FROM emrdb.memory
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id, instance_id, round(total/1024/1024/1024)
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            sum(total) as total
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time
+                                                        ORDER BY 
+                                                            time desc
+                                                        `, 
+                                    "Q-A06-totalCores" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id, coresTotal
+                                                            FROM emrdb.hadoop
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id, coresTotal
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            sum(coresTotal) as total
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time
+                                                        ORDER BY 
+                                                            time desc
+                                                        `,
+                                    "Q-A07-totalJobsRunning" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id, AVG(appsRunning) appsRunning
+                                                            FROM emrdb.hadoop
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            sum(appsRunning) as total
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time
+                                                        ORDER BY 
+                                                            time desc
+                                                        `, 
+                                    "Q-A08-cpuUsage" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id, instance_id, AVG(100-usage_idle) as cpu_usage
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id, instance_id
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            AVG(cpu_usage) as cpu_avg,
+                                                            MAX(cpu_usage) as cpu_max,
+                                                            MIN(cpu_usage) as cpu_min,
+                                                            APPROX_PERCENTILE(cpu_usage,0.1) as cpu_p10,
+                                                            APPROX_PERCENTILE(cpu_usage,0.5) as cpu_p50,
+                                                            APPROX_PERCENTILE(cpu_usage,0.9) as cpu_p90
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time
+                                                        ORDER BY 
+                                                            time desc
+                                                        `,
+                                    "Q-A09-MemoryUsage" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id,instance_id, AVG(used_percent) as memory_usage
+                                                            FROM emrdb.memory
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id,instance_id
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            APPROX_PERCENTILE(memory_usage,0.1) as memory_p10,
+                                                            APPROX_PERCENTILE(memory_usage,0.5) as memory_p50,
+                                                            APPROX_PERCENTILE(memory_usage,0.9) as memory_p90
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time
+                                                        ORDER BY 
+                                                            time desc
+                                                        `,
+                                    "Q-A10-coreUsage" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT BIN(time,{period}) as time,cluster_id,instance_id, AVG(coresUsage) as core_usage
+                                                            FROM emrdb.hadoop
+                                                            WHERE {filter}
+                                                            GROUP BY BIN(time,{period}),cluster_id, instance_id
+                                                        )
+                                                        SELECT 
+                                                            time,
+                                                            APPROX_PERCENTILE(core_usage,0.1) as cores_p10,
+                                                            APPROX_PERCENTILE(core_usage,0.5) as cores_p50,
+                                                            APPROX_PERCENTILE(core_usage,0.9) as cores_p90
+                                                        FROM 
+                                                            vw_nodes
+                                                        GROUP BY 
+                                                            time
+                                                        ORDER BY 
+                                                            time desc
+                                                        `,
+                                    "Q-A11-summaryClusters" : 
+                                                        `
+                                                        WITH vw_cluster_total_l1 AS (
+                                                          SELECT cluster_id
+                                                          FROM emrdb.cpu
+                                                          WHERE {filter}
+                                                          GROUP BY cluster_id
+                                                        ),
+                                                        vw_cluster_total AS (
+                                                          SELECT 'cursor' as label, count(*) as total
+                                                          FROM vw_cluster_total_l1
+                                                          GROUP BY 1
+                                                        ),
+                                                        vw_cluster_cpu_l1 AS (
+                                                          SELECT cluster_id, instance_id,cast(total_vcpu as bigint) as vcpu
+                                                          FROM emrdb.cpu
+                                                          WHERE {filter}
+                                                          GROUP BY 1,2,3
+                                                        ),
+                                                        vw_cluster_cpu AS (
+                                                          SELECT 'cursor' as label, sum(vcpu) as total
+                                                          FROM vw_cluster_cpu_l1  
+                                                          GROUP BY 1
+                                                        ),
+                                                        vw_cluster_memory_l1 AS (
+                                                          SELECT cluster_id,instance_id,round(total/1024/1024/1024) as total
+                                                          FROM emrdb.memory
+                                                          WHERE {filter}
+                                                          GROUP BY 1,2,3
+                                                        ),
+                                                        vw_cluster_memory AS (
+                                                          SELECT 'cursor' as label, sum(total) as total
+                                                          FROM vw_cluster_memory_l1  
+                                                          GROUP BY 1
+                                                        ),
+                                                        vw_cluster_nodes_l1 AS (
+                                                          SELECT cluster_id, instance_id
+                                                          FROM emrdb.cpu
+                                                          WHERE {filter}
+                                                          GROUP BY 1,2
+                                                        ),
+                                                        vw_cluster_nodes AS (
+                                                          SELECT 'cursor' as label, count(*) as total
+                                                          FROM vw_cluster_nodes_l1  
+                                                          GROUP BY 1
+                                                        ),
+                                                        vw_cluster_cpu_usage AS (
+                                                            SELECT 
+                                                            'cursor' as label,
+                                                            AVG(100-usage_idle) as cpu_usage_avg,
+                                                            MAX(100-usage_idle) as cpu_usage_max,
+                                                            MIN(100-usage_idle) as cpu_usage_min,
+                                                            APPROX_PERCENTILE(100-usage_idle,0.1) as cpu_usage_p10,
+                                                            APPROX_PERCENTILE(100-usage_idle,0.5) as cpu_usage_p50,
+                                                            APPROX_PERCENTILE(100-usage_idle,0.9) as cpu_usage_p90
+                                                            FROM 
+                                                                emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY 1
+                                                        ),
+                                                        vw_cluster_memory_usage AS (
+                                                            SELECT 
+                                                            'cursor' as label,
+                                                            AVG(used_percent) as memory_usage_avg,
+                                                            APPROX_PERCENTILE(used_percent,0.1) as memory_usage_p10,
+                                                            APPROX_PERCENTILE(used_percent,0.5) as memory_usage_p50,
+                                                            APPROX_PERCENTILE(used_percent,0.9) as memory_usage_p90
+                                                            FROM 
+                                                                emrdb.memory
+                                                            WHERE {filter}
+                                                            GROUP BY 1
+                                                        )
+                                                        SELECT 
+                                                            a.total as total_clusters,
+                                                            b.total as total_vcpu,
+                                                            c.total as total_memory,
+                                                            d.total as total_nodes,
+                                                            e.cpu_usage_avg,
+                                                            e.cpu_usage_max,
+                                                            e.cpu_usage_min,
+                                                            e.cpu_usage_p10,
+                                                            e.cpu_usage_p50,
+                                                            e.cpu_usage_p90,
+                                                            f.memory_usage_avg,
+                                                            f.memory_usage_p10,
+                                                            f.memory_usage_p50,
+                                                            f.memory_usage_p90
+                                                        FROM 
+                                                            vw_cluster_total a,
+                                                            vw_cluster_cpu b,
+                                                            vw_cluster_memory c,
+                                                            vw_cluster_nodes d,
+                                                            vw_cluster_cpu_usage e,
+                                                            vw_cluster_memory_usage f
+                                                        WHERE 
+                                                            a.label = b.label
+                                                            AND
+                                                            a.label = c.label
+                                                            AND
+                                                            a.label = d.label
+                                                            AND
+                                                            a.label = e.label
+                                                            AND
+                                                            a.label = f.label
+                                                        `,
+                                        "Q-A12-summaryByInstanceType" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT cluster_id,instance_id,instance_type
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY cluster_id,instance_id,instance_type
+                                                        )
+                                                        SELECT instance_type, count(*) as total
+                                                        FROM vw_nodes
+                                                        GROUP BY instance_type
+                                                        ORDER BY instance_type desc
+                                                        `,
+                                        "Q-A13-summaryByInstanceMarket" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT cluster_id,instance_id,market_type
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY cluster_id,instance_id,market_type
+                                                        )
+                                                        SELECT market_type, count(*) as total
+                                                        FROM vw_nodes
+                                                        GROUP BY market_type
+                                                        ORDER BY market_type desc
+                                                        `,
+                                        "Q-A14-summaryByInstanceRole" : 
+                                                        `
+                                                        WITH vw_nodes AS (
+                                                            SELECT cluster_id,instance_id,role
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY cluster_id,instance_id,role
+                                                        )
+                                                        SELECT role, count(*) as total
+                                                        FROM vw_nodes
+                                                        GROUP BY role
+                                                        ORDER BY role desc
+                                                        `,
+                                        "Q-A15-summaryNodesTable" : 
+                                                        `
+                                                        WITH vw_cpu AS (
+                                                            SELECT 
+                                                                    cluster_id,
+                                                                    instance_id, 
+                                                                    instance_type, 
+                                                                    market_type, 
+                                                                    cast(total_vcpu as bigint) as cpu_total,
+                                                                    AVG(100-usage_idle) as cpu_usage_avg,
+                                                                    APPROX_PERCENTILE(100-usage_idle,0.1) as cpu_usage_p10,
+                                                                    APPROX_PERCENTILE(100-usage_idle,0.5) as cpu_usage_p50,
+                                                                    APPROX_PERCENTILE(100-usage_idle,0.9) as cpu_usage_p90
+                                                            FROM emrdb.cpu
+                                                            WHERE {filter}
+                                                            GROUP BY 1,2,3,4,5
+                                                        ),
+                                                        vw_memory AS (
+                                                            SELECT 
+                                                                    cluster_id,
+                                                                    instance_id, 
+                                                                    instance_type, 
+                                                                    market_type, 
+                                                                    total as memory_total,
+                                                                    AVG(used_percent) as memory_usage_avg,
+                                                                    APPROX_PERCENTILE(used_percent,0.1) as memory_usage_p10,
+                                                                    APPROX_PERCENTILE(used_percent,0.5) as memory_usage_p50,
+                                                                    APPROX_PERCENTILE(used_percent,0.9) as memory_usage_p90
+                                                            FROM emrdb.memory
+                                                            WHERE {filter}
+                                                            GROUP BY 1,2,3,4,5
+                                                        )
+                                                        SELECT  
+                                                            a.cluster_id,
+                                                            a.instance_id, 
+                                                            a.instance_type, 
+                                                            a.market_type, 
+                                                            a.cpu_total,
+                                                            a.cpu_usage_avg,
+                                                            a.cpu_usage_p10,
+                                                            a.cpu_usage_p50,
+                                                            a.cpu_usage_p90,
+                                                            b.memory_total,
+                                                            b.memory_usage_avg,
+                                                            b.memory_usage_p10,
+                                                            b.memory_usage_p50,
+                                                            b.memory_usage_p90
+                                                        FROM vw_cpu a, vw_memory b
+                                                        WHERE
+                                                            a.instance_id = b.instance_id
+                                                        ORDER BY a.instance_id desc
+                                                        `,
+                    
+                    },
                     "global" : {
                                     "clustersByRole" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id,instance_id,role
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id,instance_id,role
                                                         )
                                                         SELECT 
@@ -25,7 +416,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id,instance_id,instance_type
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id,instance_id,instance_type
                                                         )
                                                         SELECT 
@@ -44,7 +435,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id,instance_id,market_type
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id,instance_id,market_type
                                                         )
                                                         SELECT 
@@ -63,7 +454,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id
                                                         )
                                                         SELECT 
@@ -81,7 +472,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, instance_id, total_vcpu
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id, instance_id, total_vcpu
                                                         )
                                                         SELECT 
@@ -99,7 +490,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, instance_id, round(total/1024/1024/1024) as total
                                                             FROM emrdb.memory
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id, instance_id, round(total/1024/1024/1024)
                                                         )
                                                         SELECT 
@@ -117,7 +508,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, coresTotal
                                                             FROM emrdb.hadoop
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id, coresTotal
                                                         )
                                                         SELECT 
@@ -135,7 +526,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, AVG(appsRunning) appsRunning
                                                             FROM emrdb.hadoop
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id
                                                         )
                                                         SELECT 
@@ -153,7 +544,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, AVG(100-usage_idle) as cpu_usage
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id
                                                         )
                                                         SELECT 
@@ -176,7 +567,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, AVG(used_percent) as memory_usage
                                                             FROM emrdb.memory
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id
                                                         )
                                                         SELECT 
@@ -196,7 +587,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, AVG(coresUsage) as core_usage
                                                             FROM emrdb.hadoop
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY BIN(time,{period}),cluster_id
                                                         )
                                                         SELECT 
@@ -219,8 +610,7 @@ module.exports = {
                                                             MAX(time) as time_max
                                                         FROM 
                                                             emrdb.cpu
-                                                        WHERE 
-                                                            time between {interval}
+                                                        WHERE {filter} 
                                                         GROUP BY 
                                                             cluster_id
                                                         ORDER BY 2 DESC, 3 DESC
@@ -231,7 +621,7 @@ module.exports = {
                                                         WITH vw_cluster_total_l1 AS (
                                                           SELECT cluster_id
                                                           FROM emrdb.cpu
-                                                          WHERE time between {interval}
+                                                          WHERE {filter}
                                                           GROUP BY cluster_id
                                                         ),
                                                         vw_cluster_total AS (
@@ -242,7 +632,7 @@ module.exports = {
                                                         vw_cluster_cpu_l1 AS (
                                                           SELECT cluster_id, instance_id,cast(total_vcpu as bigint) as vcpu
                                                           FROM emrdb.cpu
-                                                          WHERE time between {interval}
+                                                          WHERE {filter}
                                                           GROUP BY 1,2,3
                                                         ),
                                                         vw_cluster_cpu AS (
@@ -253,7 +643,7 @@ module.exports = {
                                                         vw_cluster_memory_l1 AS (
                                                           SELECT cluster_id,instance_id,round(total/1024/1024/1024) as total
                                                           FROM emrdb.memory
-                                                          WHERE time between {interval}
+                                                          WHERE {filter}
                                                           GROUP BY 1,2,3
                                                         ),
                                                         vw_cluster_memory AS (
@@ -264,7 +654,7 @@ module.exports = {
                                                         vw_cluster_nodes_l1 AS (
                                                           SELECT cluster_id, instance_id
                                                           FROM emrdb.cpu
-                                                          WHERE time between {interval}
+                                                          WHERE {filter}
                                                           GROUP BY 1,2
                                                         ),
                                                         vw_cluster_nodes AS (
@@ -283,7 +673,7 @@ module.exports = {
                                                             APPROX_PERCENTILE(100-usage_idle,0.9) as cpu_usage_p90
                                                             FROM 
                                                                 emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY 1
                                                         ),
                                                         vw_cluster_memory_usage AS (
@@ -295,7 +685,7 @@ module.exports = {
                                                             APPROX_PERCENTILE(used_percent,0.9) as memory_usage_p90
                                                             FROM 
                                                                 emrdb.memory
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY 1
                                                         )
                                                         SELECT 
@@ -336,7 +726,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT cluster_id,instance_id,instance_type
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY cluster_id,instance_id,instance_type
                                                         )
                                                         SELECT instance_type, count(*) as total
@@ -349,7 +739,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT cluster_id,instance_id,market_type
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY cluster_id,instance_id,market_type
                                                         )
                                                         SELECT market_type, count(*) as total
@@ -362,7 +752,7 @@ module.exports = {
                                                         WITH vw_nodes AS (
                                                             SELECT cluster_id,instance_id,role
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY cluster_id,instance_id,role
                                                         )
                                                         SELECT role, count(*) as total
@@ -380,7 +770,7 @@ module.exports = {
                                                                     market_type, 
                                                                     cast(total_vcpu as bigint) as cpu_total
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY 1,2,3,4,5
                                                         ),
                                                         vw_cpu_level_2 AS (
@@ -399,7 +789,7 @@ module.exports = {
                                                                     APPROX_PERCENTILE(100-usage_idle,0.5) as cpu_usage_p50,
                                                                     APPROX_PERCENTILE(100-usage_idle,0.9) as cpu_usage_p90
                                                             FROM emrdb.cpu
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY cluster_id
                                                         ),
                                                         vw_cpu AS (
@@ -423,7 +813,7 @@ module.exports = {
                                                                     market_type, 
                                                                     total as memory_total
                                                             FROM emrdb.memory
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY 1,2,3,4,5
                                                         ),
                                                         vw_memory_level_2 AS (
@@ -441,7 +831,7 @@ module.exports = {
                                                                     APPROX_PERCENTILE(used_percent,0.5) as memory_usage_p50,
                                                                     APPROX_PERCENTILE(used_percent,0.9) as memory_usage_p90
                                                             FROM emrdb.memory
-                                                            WHERE time between {interval}
+                                                            WHERE {filter}
                                                             GROUP BY cluster_id
                                                         ),
                                                         vw_memory AS (
@@ -474,7 +864,7 @@ module.exports = {
                                                             a.cluster_id = b.cluster_id
                                                         ORDER BY a.cluster_id desc
                                                         `,
-                    
+                                        
                     },
                     "cluster" : {
                                     "nodesSummary" :  `

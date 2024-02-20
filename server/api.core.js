@@ -1,13 +1,8 @@
-
-
 const { classEMRCluster, classEMRGlobal } = require('./class.core.js');
 const { classAWS } = require('./class.aws.js');
 const { classApplicationUpdate } = require('./class.update.js');
 const AWSObject = new classAWS();
-const EMRGlobal = new classEMRGlobal();
-
-//-- Engine Objects
-var emrObjectContainer = [];
+const EMRCluster = new classEMRCluster({ properties : { } });
 
 const fs = require('fs');
 const express = require("express");
@@ -56,29 +51,6 @@ var scheduleObjects = [];
 
 // Startup - Download PEMs Keys
 gatherPemKeys(issCognitoIdp);
-
-
-//--#################################################################################################### 
-//   ---------------------------------------- SCHEDULER
-//--#################################################################################################### 
-
-/*
-function scheduleJob5s(){
-    
-    var timestamp = new Date();
-    console.log({ time : timestamp.toTimeString().split(' ')[0], message : "5s - Scheduler" });
-    
-    //-- EMR
-    for (let engineId of Object.keys(emrObjectContainer)) {
-            emrObjectContainer[engineId].refreshData();
-    }
-    
-    
-}
-
-//scheduleObjects['5s'] = schedule.scheduleJob('* /5 * * * * *', function(){scheduleJob5s();});
-
-*/
 
 
 //--################################################################################################################
@@ -196,71 +168,6 @@ function verifyTokenCognito(token) {
 //--################################################################################################################
 
 
-
-//--++ EMR - EC2 : Open Connection - EMR Cluster
-app.get("/api/aws/emr/cluster/open/connection", async (req, res) => {
-
-    
-    // Token Validation
-    var cognitoToken = verifyTokenCognito(req.headers['x-token-cognito']);
-
-    if (cognitoToken.isValid === false)
-        return res.status(511).send({ data: [], message : "Token is invalid"});
-        
- 
-    var connectionId = "";
-    
-    
-    
-    const params = req.query;
-    
-    try {
-        
-            
-            var engineType = params.engineType;        
-            var objectId = engineType + ":" + params.clusterId;
-            var newObject = false;
-            var creationTime = new Date().toISOString();
-            
-            
-            if (!(objectId in emrObjectContainer)) {
-                console.log("Creating new object : " + objectId);
-                connectionId = uuid.v4();
-                emrObjectContainer[objectId] = new classEMRCluster({
-                                                                    properties : 
-                                                                                { 
-                                                                                    name : params.clusterId, 
-                                                                                    clusterId: params.clusterId, 
-                                                                                    uid: objectId, 
-                                                                                    engineType : engineType, 
-                                                                                    status : "-", 
-                                                                                    connectionId: connectionId, 
-                                                                                    creationTime : creationTime, 
-                                                                                    lastUpdate : "" 
-                                                                                },
-                                    
-                                    }
-                                );
-                newObject = true;
-            }
-            else {
-                console.log("Reusing object : " + objectId);
-                connectionId = emrObjectContainer[objectId].objectProperties.connectionId;
-                creationTime = emrObjectContainer[objectId].objectProperties.creationTime;
-                
-            }
-            res.status(200).send({ data : "Connection request completed", newObject : newObject, connectionId : connectionId, creationTime :  creationTime });
-                    
-            
-    }
-    catch (error) {
-        console.log(error)
-        res.status(500).send(error);
-    }
-
-});
-
-
 //--++ EMR - EC2 : Gather Stats
 app.get("/api/aws/emr/cluster/gather/stats", async (req, res) => {
 
@@ -273,8 +180,15 @@ app.get("/api/aws/emr/cluster/gather/stats", async (req, res) => {
         try
             {
                 var params = req.query;
-                var clusterData = await emrObjectContainer[params.engineType + ":" + params.clusterId].getClusterData();
-                res.status(200).send({ ... clusterData });
+                var cluster = new classEMRCluster({ 
+                                                    properties : {
+                                                                    name : params.clusterId, 
+                                                                    clusterId: params.clusterId, 
+                                                                    status : "-", 
+                                                    }
+                });
+                var clusterStats = await cluster.getClusterData();
+                res.status(200).send({ ... clusterStats });
                 
         }
         catch(err){
@@ -301,7 +215,14 @@ app.get("/api/aws/emr/cluster/gather/steps", async (req, res) => {
                   StepStates: [params.state],
                 };
 
-                var clusterSteps = await emrObjectContainer[params.engineType + ":" + params.clusterId].getClusterSteps(parameter);
+                var cluster = new classEMRCluster({ 
+                                                    properties : {
+                                                                    name : params.clusterId, 
+                                                                    clusterId: params.clusterId, 
+                                                                    status : "-", 
+                                                    }
+                });
+                var clusterSteps = await cluster.getClusterSteps(parameter);
                 res.status(200).send({ ... clusterSteps });
                 
         }
@@ -312,8 +233,8 @@ app.get("/api/aws/emr/cluster/gather/steps", async (req, res) => {
 
 
 
-//--++ EMR - EC2 : Gather node performance metrics
-app.get("/api/aws/emr/cluster/gather/node/metrics", async (req, res) => {
+//--++ EMR - EC2 : Gather node stats 
+app.get("/api/aws/emr/cluster/gather/node/stats", async (req, res) => {
 
         // Token Validation
         var cognitoToken = verifyTokenCognito(req.headers['x-token-cognito']);
@@ -329,8 +250,84 @@ app.get("/api/aws/emr/cluster/gather/node/metrics", async (req, res) => {
                   clusterId : params.clusterId,
                   instanceId : params.instanceId,
                 };
+                
+                var cluster = new classEMRCluster({ 
+                                                    properties : {
+                                                                    name : params.clusterId, 
+                                                                    clusterId: params.clusterId, 
+                                                                    status : "-", 
+                                                    }
+                });
 
-                var metrics = await emrObjectContainer[params.engineType + ":" + params.clusterId].getNodeMetrics(parameter);
+                var nodeStats = await cluster.getNodeStats(parameter);
+                res.status(200).send({ ... nodeStats });
+                
+        }
+        catch(err){
+                console.log(err);
+        }
+});
+
+
+
+//--++ EMR - EC2 : Gather node performance metrics - table
+app.get("/api/aws/emr/cluster/gather/nodes/metrics", async (req, res) => {
+
+        // Token Validation
+        var cognitoToken = verifyTokenCognito(req.headers['x-token-cognito']);
+    
+        if (cognitoToken.isValid === false)
+            return res.status(511).send({ data: [], message : "Token is invalid"});
+        
+        try
+            {
+                var params = req.query;
+                
+                const parameter = { 
+                  period : params.period,
+                  filter : params.filter,
+                };
+
+                var metrics = await EMRCluster.getAllNodesMetrics(parameter);
+                res.status(200).send({ ... metrics });
+                
+                
+        }
+        catch(err){
+                console.log(err);
+        }
+});
+
+
+
+//--++ EMR - EC2 : Gather node performance metrics
+app.get("/api/aws/emr/cluster/gather/nodes/global/stats", async (req, res) => {
+
+        // Token Validation
+        var cognitoToken = verifyTokenCognito(req.headers['x-token-cognito']);
+    
+        if (cognitoToken.isValid === false)
+            return res.status(511).send({ data: [], message : "Token is invalid"});
+        
+        try
+            {
+                var params = req.query;
+                
+                const parameter = { 
+                  clusterId : params.clusterId,
+                  period : params.period,
+                  filter : params.filter,
+                };
+                
+                var cluster = new classEMRCluster({ 
+                                                    properties : {
+                                                                    name : params.clusterId, 
+                                                                    clusterId: params.clusterId, 
+                                                                    status : "-", 
+                                                    }
+                });
+                
+                var metrics = await cluster.getHistoryClusterMetrics(parameter);
                 res.status(200).send({ ... metrics });
                 
         }
@@ -341,7 +338,8 @@ app.get("/api/aws/emr/cluster/gather/node/metrics", async (req, res) => {
 
 
 
-//--++ EMR - EC2 : Gather global performance metrics
+
+//--++ EMR - EC2 : Gather node performance metrics
 app.get("/api/aws/emr/cluster/gather/global/metrics", async (req, res) => {
 
         // Token Validation
@@ -356,10 +354,10 @@ app.get("/api/aws/emr/cluster/gather/global/metrics", async (req, res) => {
                 
                 const parameter = { 
                   period : params.period,
-                  startDate : params.startDate,
-                  endDate : params.endDate,
+                  filter : params.filter,
                 };
-
+                
+                const EMRGlobal = new classEMRGlobal();
                 var metrics = await EMRGlobal.getGlobalClusterMetrics(parameter);
                 res.status(200).send({ ... metrics });
                 
@@ -413,11 +411,11 @@ app.get("/api/aws/emr/cluster/list", async (req, res) => {
         return res.status(511).send({ data: [], message : "Token is invalid"});
  
     const params = req.query;
-   
-    var parameter = {
+    
+    var parameter = {/*
         ClusterStates: [ 
             "STARTING","BOOTSTRAPPING","RUNNING","WAITING"
-        ]
+        ]*/
     };
     
     
@@ -479,13 +477,9 @@ app.get("/api/aws/application/update/status", async (req, res) => {
 
 
 
-
-
-
 //--################################################################################################################
 //--------------------------------------------  CORE
 //--################################################################################################################
-
 
 
 app.listen(port, () => {

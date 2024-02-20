@@ -2,42 +2,30 @@ import {useState,useEffect,useRef} from 'react'
 import ReactLoading from "react-loading";
 import Axios from 'axios'
 import { configuration, SideMainLayoutHeader,SideMainLayoutMenu } from './Configs';
-import { useSearchParams } from 'react-router-dom';
 
-import { applicationVersionUpdate } from '../components/Functions';
-import { createLabelFunction, customFormatNumberLong, customFormatNumber, customFormatDateDifference, formatDateLong, customDateDifferenceMinutes } from '../components/Functions';
+import { createLabelFunction, customFormatNumberLong, customFormatNumber, customFormatDateDifference,  customDateDifferenceMinutes } from '../components/Functions';
 
-import Flashbar from "@cloudscape-design/components/flashbar";
 import ContentLayout from '@cloudscape-design/components/content-layout';
 import SideNavigation from '@cloudscape-design/components/side-navigation';
 import Header from "@cloudscape-design/components/header";
-import StatusIndicator from "@cloudscape-design/components/status-indicator";
-import Spinner from "@cloudscape-design/components/spinner";
 import { SplitPanel } from '@cloudscape-design/components';
 import AppLayout from '@cloudscape-design/components/app-layout';
-import Select from "@cloudscape-design/components/select";
 import SpaceBetween from "@cloudscape-design/components/space-between";
-import Box from "@cloudscape-design/components/box";
 import Container from "@cloudscape-design/components/container";
 import CustomHeader from "../components/Header";
-import Tabs from "@cloudscape-design/components/tabs";
 import Button from "@cloudscape-design/components/button";
 import Multiselect from "@cloudscape-design/components/multiselect";
 import ExpandableSection from "@cloudscape-design/components/expandable-section";
 import ColumnLayout from "@cloudscape-design/components/column-layout";
-
+import BreadcrumbGroup from "@cloudscape-design/components/breadcrumb-group";
 
 import CompMetric01  from '../components/Metric01';
-import ChartLine04  from '../components/ChartLine04';
 import ChartDots01  from '../components/ChartDots01';
-import ChartRangeArea01  from '../components/ChartRangeArea01';
 import CustomTable02 from "../components/Table02";
-import ChartRadialBar01 from '../components/ChartRadialBar01';
 import ChartPie01 from '../components/ChartPie-01';
 import ChartColumn01  from '../components/ChartColumn01';
 import DateTimePicker01 from "../components/DateTimePicker01";
 import ChartTimeLine01  from '../components/ChartTimeLine01';
-import ChartProgressBar01 from '../components/ChartProgressBar-01';
 import ChartRadialBar02 from '../components/ChartRadialBar02';
 
 
@@ -57,31 +45,15 @@ export const splitPanelI18nStrings: SplitPanelProps.I18nStrings = {
 };
 
 
-var CryptoJS = require("crypto-js");
 
 function Application() {
-
-    //-- Application Version
-    const [versionMessage, setVersionMessage] = useState([]);
 
     //-- Add Header Cognito Token
     Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
     Axios.defaults.headers.common['x-token-cognito'] = sessionStorage.getItem("x-token-cognito");
     Axios.defaults.withCredentials = true;
   
-    //-- Gather Parameters
-    /*
-    const [params]=useSearchParams();
-    const parameter_id=params.get("id");  
-    var parameter_object_bytes = CryptoJS.AES.decrypt(parameter_id, sessionStorage.getItem("x-token-cognito"));
-    var parameter_object_values = JSON.parse(parameter_object_bytes.toString(CryptoJS.enc.Utf8));
-    */
-    
-    //-- Variable for Active Tabs
-    const [activeSubTabId, setActiveSubTabId] = useState("tab02-01");
-    const currentSubTabId = useRef("tab02-01");
-    
-    
+
     //-- Split Panel
     const [splitPanelShow,setsplitPanelShow] = useState(false);
     const [splitPanelSize, setSplitPanelSize] = useState(400);
@@ -109,8 +81,6 @@ function Application() {
     const visibleContentClusters = ['cluster_id','nodes_total', 'cpu_total', 'cpu_usage_avg', 'cpu_usage_p10', 'cpu_usage_p50', 'cpu_usage_p90', 'memory_total', 'memory_usage_avg', 'memory_usage_p10', 'memory_usage_p50', 'memory_usage_p90' ];
     
     
-    
-
     const [globalStats,setGlobalStats] = useState({
                                                         totalClusters   : 0,
                                                         totalCPUs       : 0,
@@ -140,23 +110,25 @@ function Application() {
     
     
     var dateFilter = useRef({ type: "absolute", "startDate" : new Date((new Date).getTime() - 24 * 60 * 60 * 1000).toISOString(),  "endDate" : new Date().toISOString() });
-    //{ type: "absolute", startDate: "2018-01-09T12:34:56",endDate: "2018-01-19T15:30:00" } 
     
     const [selectedOptions,setSelectedOptions] = useState([
                                                             { label: "Cluster LifeCycle", value: "1"},
-                                                    { label: "Clusters Running", value: "2"},
-                                                    { label: "Cores Total", value: "3"},
-                                                    { label: "Cores Usage(%)", value: "4"},
-                                                    { label: "CPU Usage(%)", value: "5"},
-                                                    { label: "Instances by Class", value: "6"},
-                                                    { label: "Instances by Market", value: "7"},
-                                                    { label: "Instances by Role", value: "8"},
-                                                    { label: "Jobs Running", value: "9"},
-                                                    { label: "Memory Total(GB)", value: "10"},
-                                                    { label: "Memory Usage(%)", value: "11"},
+                                                            { label: "Clusters Running", value: "2"},
+                                                            { label: "Cores Total", value: "3"},
+                                                            { label: "Cores Usage(%)", value: "4"},
+                                                            { label: "CPU Usage(%)", value: "5"},
+                                                            { label: "Instances by Class", value: "6"},
+                                                            { label: "Instances by Market", value: "7"},
+                                                            { label: "Instances by Role", value: "8"},
+                                                            { label: "Jobs Running", value: "9"},
+                                                            { label: "Memory Total(GB)", value: "10"},
+                                                            { label: "Memory Usage(%)", value: "11"},
     ]);
     
     const [requestInProgress,setRequestInProgress] = useState(false);
+    
+    
+    
     
     //-- Function Gather Cluster Stats
     async function gatherGlobalStats() {
@@ -200,18 +172,15 @@ function Application() {
                     break;
             }
             
-            console.log(periodHours,period);
             var params = {
                 period : period,
-                startDate : " timestamp '" + startDate + "'",
-                endDate : "timestamp '" + endDate + "'"
+                filter : " time between timestamp '" + startDate + "' and timestamp '" + endDate + "'",
             };
             
             
             await Axios.get(`${api_url}/api/aws/emr/cluster/gather/global/metrics`,{
                       params: params, 
                   }).then((data)=>{
-                      console.log(data);
                       setGlobalStats(data.data); 
                       setRequestInProgress(false);
             })
@@ -225,45 +194,9 @@ function Application() {
     }
     
     
-    
-    
-    //-- Function Gather Cluster Information
-    async function gatherClusterInformation() {
-    
-        await gatherGlobalStats();
-        
-        
-        
-    }
-    
-    //-- Function Gather App Version
-   async function gatherVersion (){
-
-        //-- Application Update
-        var appVersionObject = await applicationVersionUpdate({ codeId : "dbwcmp", moduleId: "elastic-m1"} );
-        
-        if (appVersionObject.release > configuration["apps-settings"]["release"] ){
-          setVersionMessage([
-                              {
-                                type: "info",
-                                content: "New Application version is available, new features and modules will improve workload capabilities and user experience.",
-                                dismissible: true,
-                                dismissLabel: "Dismiss message",
-                                onDismiss: () => setVersionMessage([]),
-                                id: "message_1"
-                              }
-          ]);
-      
-        }
-        
-   }
-   
    
    useEffect(() => {
         gatherGlobalStats();
-        //const id = setInterval(gatherClusterInformation, configuration["apps-settings"]["refresh-interval-emr-cluster"]);
-        //return () => clearInterval(id);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     
     
@@ -273,23 +206,26 @@ function Application() {
           }); 
     }
     
-   
     
   return (
     <div>
       <CustomHeader/>
       <AppLayout
-            disableContentPaddings
-            navigation={<SideNavigation activeHref={"/dashboard/emr"} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
+            navigation={<SideNavigation activeHref={"/emr/dashboard"} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
             toolsHide
             contentType="default"
             content={
-                    
-                <div style={{"padding" : "1em" }}>
-                    <div>
-                            
+                <ContentLayout disableOverlap>
+                            <BreadcrumbGroup
+                                  items={[
+                                    { text: "EMR", href: "#" },
+                                    { text: "Clusters", href: "/emr/clusters" },
+                                    { text: "Dashboard", href: "#"}
+                                  ]}
+                                  ariaLabel="Breadcrumbs"
+                            />
+                            <br/>
                             <Container
-                                
                                 header={
                                         <Header
                                           variant="h2"
@@ -301,7 +237,7 @@ function Application() {
                                                 { requestInProgress === true  &&
                                                     <ReactLoading
                                                           type={"bars"}
-                                                          color={"#03fc4e"}
+                                                          color={"#1ab7ea"}
                                                           height={"35px"}
                                                           width={"35px"}
         
@@ -324,7 +260,7 @@ function Application() {
                                             </SpaceBetween>
                                           }
                                         >
-                                          EMR Dasboard
+                                          Summary
                                         </Header>
                                       }
                             >
@@ -443,7 +379,6 @@ function Application() {
                                 </ColumnLayout>
                             </Container>
                             <br/>
-                            
                             <ColumnLayout columns={2}>
                                 <Container
                                         header={
@@ -494,7 +429,6 @@ function Application() {
                                 </Container>
                             </ColumnLayout>
                             <br/>
-                         
                             <Container
                                     header={
                                         <Header
@@ -513,18 +447,17 @@ function Application() {
                                         description={""}
                                         pageSize={20}
                                         onSelectionItem={( item ) => {
-                                                                  /*
-                                                                    currentInstanceIdentifier.current = item[0]?.["instance_id"];
-                                                                    splitPanelState.current = true;
-                                                                    setsplitPanelShow(true);
-                                                                    gatherNodeStats();
-                                                                */
+                                                //currentInstanceIdentifier.current = item[0]?.["instance_id"];
+                                                //splitPanelState.current = true;
+                                                //setsplitPanelShow(true);
+                                                //gatherNodeStats();
                                           }
                                         }
                                         extendedTableProperties = {
                                             { variant : "borderless" }
                                         }
                                 />
+                                
                             </Container>
                             <br/>
                             { chartSelected("Cluster LifeCycle",selectedOptions) === true  &&
@@ -786,11 +719,8 @@ function Application() {
                                 </div>
                                 }
                             
-                    </div>
-                </div>
-                
+                </ContentLayout>
             }
-            disableContentHeaderOverlap={true}
             headerSelector="#h" 
         />
     </div>

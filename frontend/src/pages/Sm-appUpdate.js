@@ -69,12 +69,8 @@ function Application() {
             Axios.get(`${api_url}/api/aws/application/update/status`,{
                       params: params, 
                   }).then((data)=>{
-                    
-                   console.log(data);
                    setMessages(data.data.messages);
                    setUpdateStatus({ status : data.data.status, releaseVersion : version['release'], releaseDate : version['date'] } );
-                   
-                     
               })
               .catch((err) => {
                   console.log('Timeout API Call : /api/aws/application/update/status' );
@@ -100,9 +96,6 @@ function Application() {
             Axios.get(`${api_url}/api/aws/application/update/start`,{
                       params: params, 
                   }).then((data)=>{
-                    
-                   console.log(data);
-                   
                      
               })
               .catch((err) => {
@@ -167,7 +160,7 @@ function Application() {
                     <Flashbar items={versionMessage} />
                     
                     <br/>
-                    <Container header={<Header variant="h2" description="This module will update the application to latest version available, click update button to start the process.">
+                    <Container header={<Header variant="h2" description="To update the application to latest version available, click update button to start the process.">
                                            { ( updateStatus['status'] == 'in-progress' )  &&
                                                 <Spinner size="big" />
                                             }
@@ -183,11 +176,6 @@ function Application() {
                                 description={""}
                                 pageSize={20}
                                 onSelectionItem={( item ) => {
-                                    /*
-                                    currentInstanceIdentifier.current = item[0]?.["instance_id"];
-                                    setsplitPanelShow(true);
-                                    gatherNodeStats();
-                                    */
                                   }
                                 }
                                 extendedTableProperties = {
@@ -207,11 +195,7 @@ function Application() {
                                 
                         />
                     </Container>
-                    
                 </div>
-                
-                
-                
             }
             disableContentHeaderOverlap={true}
             headerSelector="#h" 
