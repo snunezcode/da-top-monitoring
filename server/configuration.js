@@ -392,7 +392,7 @@ module.exports = {
                     
                     },
                     "global" : {
-                                    "clustersByRole" : 
+                                    "Q-B01-clustersByRole" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id,instance_id,role
@@ -411,7 +411,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `, 
-                                    "clustersByInstanceType" : 
+                                    "Q-B02-clustersByInstanceType" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id,instance_id,instance_type
@@ -430,7 +430,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `,
-                                    "clustersByInstanceMarket" : 
+                                    "Q-B03-clustersByInstanceMarket" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id,instance_id,market_type
@@ -449,7 +449,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `,
-                                    "totalClusters" : 
+                                    "Q-B04-totalClusters" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id
@@ -467,7 +467,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `,
-                                    "totalCPUs" : 
+                                    "Q-B05-totalCPUs" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, instance_id, total_vcpu
@@ -485,7 +485,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `,
-                                    "totalMemory" : 
+                                    "Q-B06-totalMemory" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, instance_id, round(total/1024/1024/1024) as total
@@ -503,7 +503,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `, 
-                                    "totalCores" : 
+                                    "Q-B07-totalCores" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, coresTotal
@@ -521,7 +521,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `,
-                                    "totalJobsRunning" : 
+                                    "Q-B08-totalJobsRunning" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, AVG(appsRunning) appsRunning
@@ -539,7 +539,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `, 
-                                    "cpuUsage" : 
+                                    "Q-B09-cpuUsage" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, AVG(100-usage_idle) as cpu_usage
@@ -562,7 +562,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `,
-                                    "MemoryUsage" : 
+                                    "Q-B10-MemoryUsage" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, AVG(used_percent) as memory_usage
@@ -582,7 +582,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `,
-                                    "coreUsage" : 
+                                    "Q-B11-coreUsage" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,{period}) as time,cluster_id, AVG(coresUsage) as core_usage
@@ -602,7 +602,7 @@ module.exports = {
                                                         ORDER BY 
                                                             time desc
                                                         `,
-                                    "clusterLifeCycle" : 
+                                    "Q-B12-clusterLifeCycle" : 
                                                         `
                                                         SELECT 
                                                             cluster_id, 
@@ -616,7 +616,7 @@ module.exports = {
                                                         ORDER BY 2 DESC, 3 DESC
                                                                 
                                                         `,
-                                    "summaryClusters" : 
+                                    "Q-B13-summaryClusters" : 
                                                         `
                                                         WITH vw_cluster_total_l1 AS (
                                                           SELECT cluster_id
@@ -721,7 +721,7 @@ module.exports = {
                                                             AND
                                                             a.label = f.label
                                                         `,
-                                        "summaryByInstanceType" : 
+                                        "Q-B14-summaryByInstanceType" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT cluster_id,instance_id,instance_type
@@ -734,7 +734,7 @@ module.exports = {
                                                         GROUP BY instance_type
                                                         ORDER BY instance_type desc
                                                         `,
-                                        "summaryByInstanceMarket" : 
+                                        "Q-B15-summaryByInstanceMarket" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT cluster_id,instance_id,market_type
@@ -747,7 +747,7 @@ module.exports = {
                                                         GROUP BY market_type
                                                         ORDER BY market_type desc
                                                         `,
-                                        "summaryByInstanceRole" : 
+                                        "Q-B16-summaryByInstanceRole" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT cluster_id,instance_id,role
@@ -760,7 +760,7 @@ module.exports = {
                                                         GROUP BY role
                                                         ORDER BY role desc
                                                         `,
-                                        "summaryClusterTable" : 
+                                        "Q-B17-summaryClusterTable" : 
                                                         `
                                                         WITH vw_cpu_level_1 AS (
                                                             SELECT 
@@ -867,7 +867,7 @@ module.exports = {
                                         
                     },
                     "cluster" : {
-                                    "nodesSummary" :  `
+                                    "Q-C01-nodesSummary" :  `
                                                         WITH vw_cpu AS (
                                                             SELECT cluster_id, group_id, instance_type, instance_id, market_type, role, az, private_ip, total_vcpu, MAX(time) as time, cast('100' as int) - MAX_BY(usage_idle, time) as cpu_usage
                                                             FROM emrdb.cpu
@@ -941,7 +941,7 @@ module.exports = {
                                                             and
                                                             vw_cpu.instance_id = vw_network.instance_id
                                                         `,
-                                    "nodesByRole" : 
+                                    "Q-C02-nodesByRole" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time,1m) as time,cluster_id,instance_id,role
@@ -960,7 +960,7 @@ module.exports = {
                                                         ORDER BY 
                                                             role,time desc
                                                         `,
-                                    "nodesByInstanceType" : 
+                                    "Q-C03-nodesByInstanceType" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time, 1m ) as time,cluster_id,instance_id,instance_type
@@ -973,7 +973,7 @@ module.exports = {
                                                         GROUP BY time,instance_type
                                                         ORDER BY instance_type,time desc
                                                         `,
-                                    "nodesByMarketType" : 
+                                    "Q-C04-nodesByMarketType" : 
                                                         `
                                                         WITH vw_nodes AS (
                                                             SELECT BIN(time, 1m ) as time,cluster_id,instance_id,market_type
@@ -986,7 +986,7 @@ module.exports = {
                                                         GROUP BY time,market_type
                                                         ORDER BY market_type,time desc
                                                         `,
-                                    "clusterHostSummary" : 
+                                    "Q-C05-clusterHostSummary" : 
                                                         `
                                                         WITH vw_cpu AS (
                                                             SELECT 
@@ -1165,7 +1165,7 @@ module.exports = {
                                                         ORDER BY 
                                                             vw_cpu.time
                                                         `,
-                                    "clusterHadoopSummary" : 
+                                    "Q-C06-clusterHadoopSummary" : 
                                                         `
                                                             SELECT 
                                                                 cluster_id, 
@@ -1208,7 +1208,7 @@ module.exports = {
                                                         `
                             },
                             "node" : {
-                                    "metricsDetails" : 
+                                    "Q-D01-metricsDetails" : 
                                                         `
                                                         WITH vw_cpu AS (
                                                             SELECT 

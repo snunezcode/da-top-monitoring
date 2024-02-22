@@ -26,6 +26,7 @@ export const configuration =
     
 };
 
+
 export const SideMainLayoutHeader = { text: 'Amazon EMR', href: '/' };
 
 export const SideMainLayoutMenu = [
@@ -35,7 +36,7 @@ export const SideMainLayoutMenu = [
       defaultExpanded: true,
       items: [
           { type: "link", text: "Clusters", href: "/emr/clusters" },
-          { type: "link", text: "Dashboard", href: "/emr/dashboard" },
+          { type: "link", text: "Dashboard", href: "/emr/sm-emr-ec2-03" },
       ],
     },
     { type: "divider" },

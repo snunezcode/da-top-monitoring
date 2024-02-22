@@ -125,7 +125,7 @@ function Home() {
                                                   Start monitoring to your AWS EMR clusters.
                                               </Box>
                                               <br/>
-                                              <Button variant="primary" href="/clusters/emr/" >Get Started</Button>
+                                              <Button variant="primary" href="/emr/clusters/" >Get Started</Button>
                                               <br/>
                                               <br/>
                                             </div>

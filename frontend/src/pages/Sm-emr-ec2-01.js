@@ -384,7 +384,7 @@ function Application() {
       <AppLayout
             disableContentPaddings
             toolsHide
-            navigation={<SideNavigation activeHref={""} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
+            navigation={<SideNavigation activeHref={"/emr/clusters"} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
             contentType="default"
             splitPanelOpen={splitPanelShow}
             splitPanelOpen={splitPanelShow}
@@ -543,18 +543,20 @@ function Application() {
             }
             content={
                 <ContentLayout disableOverlap>
-                    
+                    <div style={{"padding-left" : "1em" }}>
+                        <BreadcrumbGroup
+                              items={[
+                                { text: "EMR", href: "#" },
+                                { text: "Clusters", href: "/emr/clusters" },
+                                { text: "Live Monitoring", href: "#" },
+                                { text: parameter_object_values["clusterId"] },
+                              ]}
+                              ariaLabel="Breadcrumbs"
+                        />
+                    </div>
                     <table style={{"width":"100%", "padding-left" : "1em", "padding-right" : "1em" }}>
                         <tr>  
                             <td style={{"width":"50%","padding-left": "1em", "border-left": "10px solid " + configuration.colors.lines.separator100,}}>  
-                                <BreadcrumbGroup
-                                      items={[
-                                        { text: "EMR", href: "#" },
-                                        { text: "Clusters", href: "/emr/clusters" },
-                                        { text: "Live Monitoring"}
-                                      ]}
-                                      ariaLabel="Breadcrumbs"
-                                />
                                 <SpaceBetween direction="horizontal" size="xs">
                                     { ( clusterStats['status'] != 'RUNNING' && clusterStats['status'] != 'WAITING' )  &&
                                         <Spinner size="big" />

@@ -81,7 +81,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 1 : Gather Nodes By Role 
                  
                 var parameters = { period : object.period, filter : object.filter };
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['clustersByRole'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B01-clustersByRole'], parameters ) });
                 
                 
                 //-- Roles Grouping
@@ -106,7 +106,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 2 : Gather Nodes By Instance Type 
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['clustersByInstanceType'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B02-clustersByInstanceType'], parameters ) });
                 
                 
                 //-- Roles Grouping
@@ -132,7 +132,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 3 : Gather Nodes By Market Type 
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['clustersByInstanceMarket'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B03-clustersByInstanceMarket'], parameters ) });
                 
                 
                 //-- Roles Grouping
@@ -157,7 +157,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 4 : Total Clusters
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalClusters'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B04-totalClusters'], parameters ) });
                 
                 var totalClusters = records.map(function (obj) {
                     return [obj.time, obj.total] ;
@@ -167,7 +167,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 5 : Total CPUs
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalCPUs'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B05-totalCPUs'], parameters ) });
                 
                 var totalCPUs = records.map(function (obj) {
                     return [obj.time, obj.total] ;
@@ -177,7 +177,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 6 : Total Memory
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalMemory'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B06-totalMemory'], parameters ) });
                 
                 var totalMemory = records.map(function (obj) {
                     return [obj.time, obj.total] ;
@@ -187,7 +187,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 7 : Total Cores
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalCores'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B07-totalCores'], parameters ) });
                 
                 var totalCores = records.map(function (obj) {
                     return [obj.time, obj.total] ;
@@ -197,7 +197,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 8 : Total Jobs Running
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['totalJobsRunning'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B08-totalJobsRunning'], parameters ) });
                 
                 var totalJobs = records.map(function (obj) {
                     return [obj.time, obj.total] ;
@@ -207,7 +207,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 9 : CPU Usage
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['cpuUsage'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B09-cpuUsage'], parameters ) });
                 
                 var cpuUsageP10 = records.map(function (obj) {
                     return [obj.time, obj.cpu_p10] ;
@@ -227,7 +227,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 10 : Memory Usage
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['MemoryUsage'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B10-MemoryUsage'], parameters ) });
                 
                 var memoryUsageP10 = records.map(function (obj) {
                     return [obj.time, obj.memory_p10] ;
@@ -245,7 +245,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 11 : Cores Usage
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['coreUsage'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B11-coreUsage'], parameters ) });
                 
                 var coresUsageP10 = records.map(function (obj) {
                     return [obj.time, obj.cores_p10] ;
@@ -264,7 +264,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 12 : Cluster Life Cycle
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['clusterLifeCycle'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B12-clusterLifeCycle'], parameters ) });
                 
                 var clusterLifeCycle = records.map(function (obj) {
                     return { x : obj.cluster_id, y : [new Date(obj.time_min).getTime() , new Date(obj.time_max).getTime() ] } ;
@@ -274,7 +274,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 13 : Cluster Summary
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryClusters'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B13-summaryClusters'], parameters ) });
                 
                 var summaryClusters = {
                         totalClusters   : records[0]?.['total_clusters'] || 0,
@@ -289,7 +289,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 14 : Cluster Summary by Instance Type
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryByInstanceType'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B14-summaryByInstanceType'], parameters ) });
                 
                 var globalInstanceType = records.map(function (obj) {
                           return { name : obj.instance_type, value : obj.total};
@@ -300,7 +300,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 15 : Cluster Summary by Instance Market
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryByInstanceMarket'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B15-summaryByInstanceMarket'], parameters ) });
                 
                 var globalInstanceMarket = records.map(function (obj) {
                           return { name : obj.market_type, value : obj.total};
@@ -310,7 +310,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 16 : Cluster Summary by Instance Role
                  
                 
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryByInstanceRole'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B16-summaryByInstanceRole'], parameters ) });
                 
                 var globalInstanceRole = records.map(function (obj) {
                           return { name : obj.role, value : obj.total};
@@ -321,7 +321,7 @@ class classEMRGlobal {
                 //+++++++ SECTION 17 : Cluster Summary by Instance Role
                  
                 
-                var clusters = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['summaryClusterTable'], parameters ) });
+                var clusters = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['global']['Q-B17-summaryClusterTable'], parameters ) });
                 
                 
                 result = { 
@@ -560,7 +560,7 @@ class classEMRCluster {
                 //+++++++ SECTION 1 : Gather Node Performance Information (Table)
                 
                 var parameters = { cluster_id : this.objectProperties.clusterId };
-                var nodesSummary = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['nodesSummary'], parameters ) });
+                var nodesSummary = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['Q-C01-nodesSummary'], parameters ) });
                 
                 
                 //-- Instance Types Summary
@@ -627,7 +627,7 @@ class classEMRCluster {
                 //+++++++ SECTION 2 : Gather Nodes By Role 
                  
                 var parameters = { cluster_id : this.objectProperties.clusterId, period : '60m' };
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['nodesByRole'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['Q-C02-nodesByRole'], parameters ) });
                 
                 
                 //-- Roles Grouping
@@ -654,7 +654,7 @@ class classEMRCluster {
                 
                 
                 var parameters = { cluster_id : this.objectProperties.clusterId, period : '60m' };
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['nodesByInstanceType'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['Q-C03-nodesByInstanceType'], parameters ) });
                 
                 
                 //-- Instances Grouping
@@ -680,7 +680,7 @@ class classEMRCluster {
                 
                 
                 var parameters = { cluster_id : this.objectProperties.clusterId, period : '60m' };
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['nodesByMarketType'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['Q-C04-nodesByMarketType'], parameters ) });
                 
                 
                 //-- Instances Grouping
@@ -707,7 +707,7 @@ class classEMRCluster {
                 
                     
                 var parameters = { cluster_id : this.objectProperties.clusterId, period : '15m' };
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['clusterHostSummary'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['Q-C05-clusterHostSummary'], parameters ) });
             
                  
                 //-- CPU
@@ -780,7 +780,7 @@ class classEMRCluster {
                 //+++++++ SECTION 6 : Gather Hadoop Performance (Table)
                 
                 var parameters = { cluster_id : this.objectProperties.clusterId, period : '5m' };
-                var hadoopSummary = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['clusterHadoopSummary'], parameters ) });
+                var hadoopSummary = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['Q-C06-clusterHadoopSummary'], parameters ) });
                 
                 
                 //+++++++ SECTION SUMMARY 
@@ -885,7 +885,7 @@ class classEMRCluster {
                 
                 
                 var parameters = { cluster_id : this.objectProperties.clusterId, instance_id : object.instanceId, period : '15m' };
-                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['node']['metricsDetails'], parameters ) });
+                var records = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['node']['Q-D01-metricsDetails'], parameters ) });
             
                 var cpu = records.map(function (obj) {
                     return [obj.time, obj.cpu_usage] ;

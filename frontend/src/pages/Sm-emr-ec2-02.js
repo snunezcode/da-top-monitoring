@@ -140,16 +140,20 @@ function Application() {
     var dateFilter = useRef({ type: "absolute", "startDate" : parameter_object_values["startDate"],  "endDate" : parameter_object_values["endDate"] });
     
     const [selectedOptions,setSelectedOptions] = useState([
-                                                            { label: "Steps LifeCycle", value: "1"},
-                                                            { label: "Cores Total", value: "3"},
-                                                            { label: "Cores Usage(%)", value: "4"},
-                                                            { label: "CPU Usage(%)", value: "5"},
-                                                            { label: "Instances by Class", value: "6"},
-                                                            { label: "Instances by Market", value: "7"},
-                                                            { label: "Instances by Role", value: "8"},
-                                                            { label: "Jobs Running", value: "9"},
-                                                            { label: "Memory Total(GB)", value: "10"},
-                                                            { label: "Memory Usage(%)", value: "11"},
+                                                            { label: "Cores Total", value: "1"},
+                                                            { label: "Cores Usage(%)", value: "2"},
+                                                            { label: "CPU Usage(%)", value: "3"},
+                                                            { label: "Instances Distribution", value: "4"},
+                                                            { label: "Instances by Class", value: "5"},
+                                                            { label: "Instances by Market", value: "6"},
+                                                            { label: "Instances by Role", value: "7"},
+                                                            { label: "Jobs Running", value: "8"},
+                                                            { label: "Memory Total(GB)", value: "9"},
+                                                            { label: "Memory Usage(%)", value: "10"},
+                                                            { label: "Nodes Details", value: "11"},
+                                                            { label: "Resource Usage", value: "12"},
+                                                            { label: "Steps Details", value: "13"},
+                                                            { label: "Steps LifeCycle", value: "14"},
     ]);
     
     const [requestInProgress,setRequestInProgress] = useState(false);
@@ -237,7 +241,7 @@ function Application() {
       <CustomHeader/>
       <AppLayout
             toolsHide
-            navigation={<SideNavigation activeHref={""} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
+            navigation={<SideNavigation activeHref={"/emr/clusters"} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
             contentType="default"
             content={
                 <ContentLayout disableOverlap>
@@ -245,7 +249,8 @@ function Application() {
                           items={[
                             { text: "EMR", href: "#" },
                             { text: "Clusters", href: "/emr/clusters" },
-                            { text: "Insight Monitoring", href: "#"}
+                            { text: "Insight Monitoring", href: "#"},
+                            { text: parameter_object_values["clusterId"] , href: "#"}
                           ]}
                           ariaLabel="Breadcrumbs"
                     />
@@ -353,16 +358,20 @@ function Application() {
                                                 setSelectedOptions(detail.selectedOptions)
                                               }
                                               options={[
-                                                { label: "Steps LifeCycle", value: "1"},
-                                                { label: "Cores Total", value: "3"},
-                                                { label: "Cores Usage(%)", value: "4"},
-                                                { label: "CPU Usage(%)", value: "5"},
-                                                { label: "Instances by Class", value: "6"},
-                                                { label: "Instances by Market", value: "7"},
-                                                { label: "Instances by Role", value: "8"},
-                                                { label: "Jobs Running", value: "9"},
-                                                { label: "Memory Total(GB)", value: "10"},
-                                                { label: "Memory Usage(%)", value: "11"},
+                                                { label: "Cores Total", value: "1"},
+                                                { label: "Cores Usage(%)", value: "2"},
+                                                { label: "CPU Usage(%)", value: "3"},
+                                                { label: "Instances Distribution", value: "4"},
+                                                { label: "Instances by Class", value: "5"},
+                                                { label: "Instances by Market", value: "6"},
+                                                { label: "Instances by Role", value: "7"},
+                                                { label: "Jobs Running", value: "8"},
+                                                { label: "Memory Total(GB)", value: "9"},
+                                                { label: "Memory Usage(%)", value: "10"},
+                                                { label: "Nodes Details", value: "11"},
+                                                { label: "Resource Usage", value: "12"},
+                                                { label: "Steps Details", value: "13"},
+                                                { label: "Steps LifeCycle", value: "14"},
                                               ]}
                                               placeholder="Choose Widgets"
                                             />
@@ -374,127 +383,144 @@ function Application() {
                     </Container>
                     <br/>
                     
-                    <Container
-                            header={
-                                <Header
-                                  variant="h2"
-                                >
-                                  Instance Distribution
-                                </Header>
-                                }
-                    >
-                        <br/>
-                        <ColumnLayout columns={3} variant="text-grid">
-                            <div>
-                                <ChartPie01 
-                                        title={"Instances by Type"} 
-                                        height="300px" 
-                                        width="100%" 
-                                        dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceType']) }
-                                />
-                            </div>
-                            <div>
-                                <ChartPie01 
-                                        title={"Instances by Market"} 
-                                        height="300px" 
-                                        width="100%" 
-                                        dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceMarket']) }
-                                />
-                            </div>
-                            <div>
-                              <ChartPie01 
-                                        title={"Instances by Role"} 
-                                        height="300px" 
-                                        width="100%" 
-                                        dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceRole']) }
-                                />
-                            </div>
-                        </ColumnLayout>
-                    </Container>
-                    <br/>
+                    { chartSelected("Instances Distribution",selectedOptions) === true  &&
+                        <div>
+                            <Container
+                                    header={
+                                        <Header
+                                          variant="h2"
+                                        >
+                                          Instances Distribution
+                                        </Header>
+                                        }
+                            >
+                                <br/>
+                                <ColumnLayout columns={3} variant="text-grid">
+                                    <div>
+                                        <ChartPie01 
+                                                title={"Instances by Type"} 
+                                                height="300px" 
+                                                width="100%" 
+                                                dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceType']) }
+                                        />
+                                    </div>
+                                    <div>
+                                        <ChartPie01 
+                                                title={"Instances by Market"} 
+                                                height="300px" 
+                                                width="100%" 
+                                                dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceMarket']) }
+                                        />
+                                    </div>
+                                    <div>
+                                      <ChartPie01 
+                                                title={"Instances by Role"} 
+                                                height="300px" 
+                                                width="100%" 
+                                                dataset = { JSON.stringify(globalStats['charts']?.['globalInstanceRole']) }
+                                        />
+                                    </div>
+                                </ColumnLayout>
+                            </Container>
+                            <br/>
+                        </div>
+                    }
                     
-                    <ColumnLayout columns={2}>
-                        <Container
-                                header={
-                                    <Header
-                                      variant="h2"
-                                    >
-                                      CPU Usage(%)
-                                    </Header>
-                                    }
-                        >
-                            <br/>
-                            <ChartRadialBar02 
-                                        title={""} 
-                                        height="300px" 
-                                        width="100%" 
-                                        labels = {JSON.stringify(['Average','P10', 'P50','P90'])}
-                                        series = {JSON.stringify([
-                                                                    Math.round(globalStats['cpuUsage']?.['avg']),
-                                                                    Math.round(globalStats['cpuUsage']?.['p10']),
-                                                                    Math.round(globalStats['cpuUsage']?.['p50']),
-                                                                    Math.round(globalStats['cpuUsage']?.['p90']),
-                                        ])}
-                            />
-                        </Container>
-                        
-                        <Container
-                                header={
-                                    <Header
-                                      variant="h2"
-                                    >
-                                      Memory Usage(%)
-                                    </Header>
-                                    }
-                        >
-                            <br/>
-                            <ChartRadialBar02 
-                                        title={""} 
-                                        height="300px" 
-                                        width="100%" 
-                                        labels = {JSON.stringify(['Average', 'P10', 'P50', 'P90'])}
-                                        series = {JSON.stringify([
-                                                                    Math.round(globalStats['memoryUsage']?.['avg']),
-                                                                    Math.round(globalStats['memoryUsage']?.['p10']),
-                                                                    Math.round(globalStats['memoryUsage']?.['p50']),
-                                                                    Math.round(globalStats['memoryUsage']?.['p90']),
-                                        ])}
-                            />
-                        </Container>
-                    </ColumnLayout>
-                    <br/>
-                    <Container
-                            header={
-                                <Header
-                                  variant="h2"
+                    
+                    { chartSelected("Resource Usage",selectedOptions) === true  &&
+                        <div>
+                            <ColumnLayout columns={2}>
+                                <Container
+                                        header={
+                                            <Header
+                                              variant="h2"
+                                            >
+                                              CPU Usage(%)
+                                            </Header>
+                                            }
                                 >
-                                  Cluster Details
-                                </Header>
-                                }
-                    >
-                        <br/>
-                        <CustomTable02
-                                columnsTable={columnsTableNodes}
-                                visibleContent={visibleContentNodes}
-                                dataset={globalStats['nodes']}
-                                title={"Nodes"}
-                                description={""}
-                                pageSize={20}
-                                onSelectionItem={( item ) => {
-                                                          /*
-                                                            currentInstanceIdentifier.current = item[0]?.["instance_id"];
-                                                            splitPanelState.current = true;
-                                                            setsplitPanelShow(true);
-                                                            gatherNodeStats();
-                                                        */
-                                  }
-                                }
-                                extendedTableProperties = {
-                                    { variant : "borderless" }
-                                }
-                        />
-                    </Container>
-                    <br/>
+                                    <br/>
+                                    <ChartRadialBar02 
+                                                title={""} 
+                                                height="300px" 
+                                                width="100%" 
+                                                labels = {JSON.stringify(['Average','P10', 'P50','P90'])}
+                                                series = {JSON.stringify([
+                                                                            Math.round(globalStats['cpuUsage']?.['avg']),
+                                                                            Math.round(globalStats['cpuUsage']?.['p10']),
+                                                                            Math.round(globalStats['cpuUsage']?.['p50']),
+                                                                            Math.round(globalStats['cpuUsage']?.['p90']),
+                                                ])}
+                                    />
+                                </Container>
+                                
+                                <Container
+                                        header={
+                                            <Header
+                                              variant="h2"
+                                            >
+                                              Memory Usage(%)
+                                            </Header>
+                                            }
+                                >
+                                    <br/>
+                                    <ChartRadialBar02 
+                                                title={""} 
+                                                height="300px" 
+                                                width="100%" 
+                                                labels = {JSON.stringify(['Average', 'P10', 'P50', 'P90'])}
+                                                series = {JSON.stringify([
+                                                                            Math.round(globalStats['memoryUsage']?.['avg']),
+                                                                            Math.round(globalStats['memoryUsage']?.['p10']),
+                                                                            Math.round(globalStats['memoryUsage']?.['p50']),
+                                                                            Math.round(globalStats['memoryUsage']?.['p90']),
+                                                ])}
+                                    />
+                                </Container>
+                            </ColumnLayout>
+                            <br/>
+                    
+                        </div>
+                    }
+                    
+                    { chartSelected("Nodes Details",selectedOptions) === true  &&
+                        <div>
+                            <Container
+                                    header={
+                                        <Header
+                                          variant="h2"
+                                        >
+                                          Nodes Details
+                                        </Header>
+                                        }
+                            >
+                                <br/>
+                                <CustomTable02
+                                        columnsTable={columnsTableNodes}
+                                        visibleContent={visibleContentNodes}
+                                        dataset={globalStats['nodes']}
+                                        title={"Nodes"}
+                                        description={""}
+                                        pageSize={20}
+                                        onSelectionItem={( item ) => {
+                                                                  /*
+                                                                    currentInstanceIdentifier.current = item[0]?.["instance_id"];
+                                                                    splitPanelState.current = true;
+                                                                    setsplitPanelShow(true);
+                                                                    gatherNodeStats();
+                                                                */
+                                          }
+                                        }
+                                        extendedTableProperties = {
+                                            { variant : "borderless" }
+                                        }
+                                />
+                            </Container>
+                            <br/>
+                        </div>
+                    }
+                    
+                    
                     { chartSelected("Steps LifeCycle",selectedOptions) === true  &&
                         <div>
                             <Container header={
@@ -519,34 +545,41 @@ function Application() {
                             <br/>
                         </div>
                     }
-                    <Container
-                            header={
-                                <Header
-                                  variant="h2"
-                                >
-                                  Step Details
-                                </Header>
-                                }
-                    >
-                        <br/>
-                        <CustomTable02
-                                columnsTable={columnsTableSteps}
-                                visibleContent={visibleContentSteps}
-                                dataset={globalStats['clusterSteps']}
-                                title={"Steps"}
-                                description={""}
-                                pageSize={20}
-                                onSelectionItem={( item ) => {
-                                    
-                                  }
-                                }
-                                extendedTableProperties = {
-                                    { variant : "borderless" }
-                                    
-                                }
-                        />
-                    </Container>
-                    <br/>
+                    
+                    { chartSelected("Steps Details",selectedOptions) === true  &&
+                        <div>
+                    
+                            <Container
+                                    header={
+                                        <Header
+                                          variant="h2"
+                                        >
+                                          Step Details
+                                        </Header>
+                                        }
+                            >
+                                <br/>
+                                <CustomTable02
+                                        columnsTable={columnsTableSteps}
+                                        visibleContent={visibleContentSteps}
+                                        dataset={globalStats['clusterSteps']}
+                                        title={"Steps"}
+                                        description={""}
+                                        pageSize={20}
+                                        onSelectionItem={( item ) => {
+                                            
+                                          }
+                                        }
+                                        extendedTableProperties = {
+                                            { variant : "borderless" }
+                                            
+                                        }
+                                />
+                            </Container>
+                            <br/>
+                        </div>
+                    }
+                    
                     { chartSelected("Instances by Role",selectedOptions) === true  &&
                         <div>
                             <Container header={
