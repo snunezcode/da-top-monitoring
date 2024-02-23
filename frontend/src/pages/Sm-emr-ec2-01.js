@@ -1128,7 +1128,9 @@ function Application() {
                                         ]}
                                 
                             />
-                                            
+                            
+                            { (activeSubTabId === "tab02-01" || activeSubTabId === "tab02-02" || activeSubTabId === "tab02-03" || activeSubTabId === "tab02-04")   &&
+                            
                             <Container>
                                 <CustomTable02
                                         columnsTable={columnsTableNodes}
@@ -1150,6 +1152,7 @@ function Application() {
                                         }
                                 />
                             </Container>
+                            }
                                 
                     </div>
                 
