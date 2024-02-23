@@ -419,6 +419,7 @@ class classEMRCluster {
                                                                         instanceTypes       : [],
                                                                         marketTypes         : [],
                                                                         roles               : [],
+                                                                        stepsLifeCycle      : [],
                                                                         
                                                     },
                                 },
@@ -703,7 +704,22 @@ class classEMRCluster {
                 }
                 
                 
-                //+++++++ SECTION 5 : Gather Cluster Performance Information over time
+                //+++++++ SECTION 5 : Steps LifeCycle
+                
+                var records = await AWSObject.getEMRClusterSteps({ 
+                                                                      ClusterId: this.objectProperties.clusterId,
+                                                                      StepStates: ['COMPLETED','RUNNING'],
+                });
+                
+                var stepsLifeCycle = [];
+                if (Array.isArray(records['Steps'])){
+                    stepsLifeCycle = records['Steps'].map(function (obj) {
+                        return { state : obj['Status']?.['State'] , x : obj.Id, y : [new Date(obj['Status']?.['Timeline']?.['StartDateTime']).getTime() , ( obj['Status']?.['Timeline']?.['EndDateTime'] !== undefined ? new Date(obj['Status']?.['Timeline']?.['EndDateTime']).getTime() : new Date().getTime())  ] } ;
+                    });
+                }
+                
+                
+                //+++++++ SECTION 6 : Gather Cluster Performance Information over time
                 
                     
                 var parameters = { cluster_id : this.objectProperties.clusterId, period : '15m' };
@@ -777,10 +793,12 @@ class classEMRCluster {
                 });
                 
                 
-                //+++++++ SECTION 6 : Gather Hadoop Performance (Table)
+                //+++++++ SECTION 7 : Gather Hadoop Performance (Table)
                 
                 var parameters = { cluster_id : this.objectProperties.clusterId, period : '5m' };
                 var hadoopSummary = await AWSObject.executeTSQuery({ query : replaceParameterValues(configuration['queries']['cluster']['Q-C06-clusterHadoopSummary'], parameters ) });
+                
+                
                 
                 
                 //+++++++ SECTION SUMMARY 
@@ -817,7 +835,8 @@ class classEMRCluster {
                                                                 instanceMarketColumn : { series : instanceMarketSeries, categories : instanceMarketCategories },
                                                                 instanceTypes       : instanceTypes, 
                                                                 marketTypes         : marketTypes, 
-                                                                roles               : roles 
+                                                                roles               : roles,
+                                                                stepsLifeCycle      : stepsLifeCycle,
                                                     }
                                         },
                                         hadoop : {

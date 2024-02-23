@@ -26,6 +26,7 @@ import CustomTable02 from "../components/Table02";
 import ChartRadialBar01 from '../components/ChartRadialBar01';
 import ChartPie01 from '../components/ChartPie-01';
 import ChartColumn01  from '../components/ChartColumn01';
+import ChartTimeLine01  from '../components/ChartTimeLine01';
 
 import '@aws-amplify/ui-react/styles.css';
 
@@ -97,7 +98,7 @@ function Application() {
                   {id: 'recv_bytes',header: 'NetBytesRecv',cell: item => customFormatNumberLong(parseFloat(item['recv_bytes']),2),ariaLabel: createLabelFunction('recv_bytes'),sortingField: 'recv_bytes',},
     ];
     
-    const visibleContentNodes = ['instance_id','cluster_id', 'group_id', 'role', 'instance_type', 'market_type', 'az', 'total_vcpu','total_memory', 'cpu_usage', 'memory_usage', 'total_disk_bytes', 'total_iops', 'total_network_bytes'];
+    const visibleContentNodes = ['instance_id','role', 'instance_type', 'market_type', 'az', 'total_vcpu','total_memory', 'cpu_usage', 'memory_usage', 'total_disk_bytes', 'total_iops', 'total_network_bytes'];
     
     
     //-- Table Steps
@@ -155,6 +156,7 @@ function Application() {
                                                                                                 instanceTypes       : [],
                                                                                                 marketTypes         : [],
                                                                                                 roles               : [],
+                                                                                                stepsLifeCycle      : [],
                                                                                                 
                                                                             },
                                                         },
@@ -289,6 +291,7 @@ function Application() {
                       params: params, 
                   }).then((data)=>{
                       setClusterStats(data.data); 
+                      console.log(data.data);
             })
             .catch((err) => {
                       console.log('Timeout API Call : /api/aws/emr/cluster/gather/stats' );
@@ -1044,6 +1047,16 @@ function Application() {
                                             content: 
                                                 <div style={{"padding-top" : "1em", "padding-bottom" : "1em"}}>
                                                     <Container>
+                                                        <ChartTimeLine01 
+                                                                series={JSON.stringify(clusterStats['host']?.['charts']?.['stepsLifeCycle'])} 
+                                                                title={"Steps LifeCycle"} 
+                                                                height="300px" 
+                                                                onClickData={(element) => {
+                                                                                    console.log(element);
+                                                                                }
+                                                                }
+                                                                toolbar={true}
+                                                        />
                                                         <CustomTable02
                                                                 columnsTable={columnsTableSteps}
                                                                 visibleContent={visibleContentSteps}

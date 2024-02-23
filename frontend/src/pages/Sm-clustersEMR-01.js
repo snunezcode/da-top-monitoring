@@ -281,7 +281,7 @@ function Application() {
                                                     direction="horizontal"
                                                     size="xs"
                                                   >
-                                                    <Button variant="primary" onClick={() => { onClickLive(); }} iconName="external">Live Monitoring</Button>
+                                                    <Button variant="primary" onClick={() => { onClickLive(); }} iconName="external" disabled={ ( String(selectedItems[0]?.['state']).includes("TERMINATE") ? true : false ) } >Live Monitoring</Button>
                                                   </SpaceBetween>
                                           }
                                           
@@ -351,7 +351,7 @@ function Application() {
                                       direction="horizontal"
                                       size="xs"
                                     >
-                                      <Button variant="primary" onClick={ onClickLive } iconName="external">Live Monitoring</Button>
+                                      <Button variant="primary" onClick={ onClickLive } iconName="external" disabled={ ( String(selectedItems[0]?.['state']).includes("TERMINATE") ? true : false ) }>Live Monitoring</Button>
                                       <Button variant="primary" onClick={ onClickInsight } iconName="external">Insight Monitoring</Button>
                                       <Button variant="primary" onClick={() => { gatherClusters(); }}>Refresh</Button>
                                     </SpaceBetween>
