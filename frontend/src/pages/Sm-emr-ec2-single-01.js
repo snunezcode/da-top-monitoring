@@ -175,7 +175,7 @@ function Application() {
             Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
             
             // Select engine type
-            var pathName = "/emr/sm-emr-ec2-01";
+            var pathName = "/emr/sm-emr-ec2-single-03";
              
             
             var id = CryptoJS.AES.encrypt(JSON.stringify({
@@ -201,7 +201,7 @@ function Application() {
             Axios.defaults.headers.common['x-csrf-token'] = sessionStorage.getItem("x-csrf-token");
             
             // Select engine type
-            var pathName = "/emr/sm-emr-ec2-02";
+            var pathName = "/emr/sm-emr-ec2-single-02";
              
             
             var id = CryptoJS.AES.encrypt(JSON.stringify({
@@ -261,7 +261,7 @@ function Application() {
         <AppLayout
             disableContentPaddings
             toolsHide
-            navigation={<SideNavigation activeHref={"/emr/clusters"} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
+            navigation={<SideNavigation activeHref={"/emr/sm-emr-ec2-single-01"} items={SideMainLayoutMenu} header={SideMainLayoutHeader} />}
             contentType="default"
             splitPanelOpen={splitPanelShow}
             onSplitPanelToggle={() => setsplitPanelShow(false)}
